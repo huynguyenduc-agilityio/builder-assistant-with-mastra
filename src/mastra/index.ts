@@ -17,9 +17,6 @@ export const mastra = new Mastra({
     name: 'Mastra',
     level: 'info',
   }),
-  bundler: {
-    externals: ['@copilotkit/runtime'],
-  },
   server: {
     port: 4750,
     cors: {
