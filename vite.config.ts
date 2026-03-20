@@ -12,6 +12,20 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
+    {
+      name: "mock-module",
+      enforce: "pre",
+      resolveId(id) {
+        if (id === "module") {
+          return "virtual:module";
+        }
+      },
+      load(id) {
+        if (id === "virtual:module") {
+          return "export const createRequire = () => () => {}; export default { createRequire };";
+        }
+      },
+    },
   ],
   resolve: {
     alias: {
