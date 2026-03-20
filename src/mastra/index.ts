@@ -1,21 +1,23 @@
-import { registerCopilotKit } from '@ag-ui/mastra/copilotkit';
 import { Mastra } from '@mastra/core/mastra';
-import { LibSQLStore } from '@mastra/libsql';
-import { PinoLogger } from '@mastra/loggers';
+import { ConsoleLogger, LogLevel } from '@mastra/core/logger';
+import { registerCopilotKit } from '@ag-ui/mastra/copilotkit';
+import { registerApiRoute } from '@mastra/core/server';
 
-import { ghibliAgent } from './agents';
+import { createStorage } from './storages';
+import { API_ROUTES } from './constants';
+import { POST as infoHubEmbedPost } from '@/api/infoHub/embed/route';
+import { POST as infoHubDeletePost } from '@/api/infoHub/delete/route';
+import { infoHubAgent } from './agents/infoHub/info-hub-agent';
+
+const LOG_LEVEL = (process.env.LOG_LEVEL as LogLevel) || 'debug';
 
 export const mastra = new Mastra({
   agents: {
-    ghibliAgent,
+    infoHubAgent: infoHubAgent(createStorage()),
   },
-  storage: new LibSQLStore({
-    id: 'mastra-storage',
-    url: ':memory:',
-  }),
-  logger: new PinoLogger({
-    name: 'Mastra',
-    level: 'info',
+  storage: createStorage(),
+  logger: new ConsoleLogger({
+    level: LOG_LEVEL,
   }),
   server: {
     port: 4750,
@@ -25,6 +27,18 @@ export const mastra = new Mastra({
       allowHeaders: ['*'],
     },
     apiRoutes: [
+      registerApiRoute(API_ROUTES.INFO_HUB.EMBEDDED, {
+        method: 'POST',
+        handler: async (c: any) => {
+          return infoHubEmbedPost(c);
+        },
+      }),
+      registerApiRoute(API_ROUTES.INFO_HUB.DELETE, {
+        method: 'POST',
+        handler: async () => {
+          return infoHubDeletePost();
+        },
+      }),
       registerCopilotKit({
         path: '/copilotkit',
         resourceId: 'copilotkit-resource',
