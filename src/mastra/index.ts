@@ -20,7 +20,8 @@ export const mastra = new Mastra({
     level: LOG_LEVEL,
   }),
   server: {
-    port: 4750,
+    port: Number(process.env.PORT) || 4750,
+    host: '0.0.0.0',
     cors: {
       origin: '*',
       allowMethods: ['*'],
