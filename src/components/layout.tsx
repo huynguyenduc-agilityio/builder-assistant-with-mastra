@@ -12,7 +12,7 @@ export default function Page({ children }: { children: React.ReactNode }) {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
             <div className="flex flex-row gap-2 items-center">
-              <h1 className="font-bold text-xl">DevDay Assit</h1>
+              <h1 className="font-bold text-xl">DevDay Assistant</h1>
             </div>
           </div>
         </header>

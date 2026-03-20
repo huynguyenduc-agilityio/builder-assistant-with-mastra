@@ -1,1 +1,1 @@
-export * from './ghibli-tool';
+export * from './query-info-data';
