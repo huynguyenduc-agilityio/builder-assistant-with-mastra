@@ -57,8 +57,18 @@ const queryInfoDataToolExecute = async ({ query }: { query?: string }) => {
       parsed = null;
     }
 
-    return parsed ? JSON.stringify(parsed.data) : answer;
+    if (parsed) {
+      const data = Array.isArray(parsed) ? parsed : (parsed.data ?? parsed);
+      return JSON.stringify(data);
+    }
+
+    return answer;
   } catch (error: unknown) {
     console.error('queryInfoDataToolExecute error:', error);
+    return JSON.stringify({
+      success: false,
+      message: 'Failed to query information. Please try again.',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 };
