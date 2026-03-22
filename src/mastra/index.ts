@@ -7,6 +7,8 @@ import { createStorage } from './storages';
 import { API_ROUTES } from './constants';
 import { POST as infoHubEmbedPost } from '@/api/infoHub/embed/route';
 import { POST as infoHubDeletePost } from '@/api/infoHub/delete/route';
+import { POST as ratingSubmitPost } from '@/api/rating/submit/route';
+import { GET as ratingGetHandler } from '@/api/rating/get/route';
 import { infoHubAgent } from './agents/infoHub/info-hub-agent';
 
 const LOG_LEVEL = (process.env.LOG_LEVEL as LogLevel) || 'debug';
@@ -40,6 +42,18 @@ export const mastra = new Mastra({
           return infoHubDeletePost();
         },
       }),
+      registerApiRoute(API_ROUTES.RATING.SUBMIT, {
+        method: 'POST',
+        handler: async (c: any) => {
+          return ratingSubmitPost(c);
+        },
+      }),
+      registerApiRoute(API_ROUTES.RATING.GET, {
+        method: 'GET',
+        handler: async (c: any) => {
+          return ratingGetHandler(c);
+        },
+      }),
       registerCopilotKit({
         path: '/copilotkit',
         resourceId: 'copilotkit-resource',
@@ -47,3 +61,4 @@ export const mastra = new Mastra({
     ],
   },
 });
+
