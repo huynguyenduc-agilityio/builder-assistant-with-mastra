@@ -4,11 +4,15 @@ export const summarizeText = async (
   message: string,
   content: string,
   prompt = '',
+  maxTokens?: number,
 ) => {
   // Generate title using LLM (using OpenAI SDK directly to avoid version conflicts)
   const openaiClient = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
+
+  // Use higher token limit when a custom prompt is provided (e.g. RAG answer prompt)
+  const tokenLimit = maxTokens ?? (prompt ? 500 : 100);
 
   const completion = await openaiClient.chat.completions.create({
     model: process.env.LLM_OPENAI_MODEL || 'gpt-4o-mini',
@@ -27,7 +31,7 @@ export const summarizeText = async (
         `,
       },
     ],
-    max_tokens: 100,
+    max_tokens: tokenLimit,
     temperature: 0.7,
   });
 
