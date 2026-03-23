@@ -1,5 +1,5 @@
 export const INFO_HUB_RAG_PROMPT = {
-  answer_prompt: (question: string, availableCodes = '') => `
+  answer_prompt: (question: string, retrievedContent = '', imageData: string[] = []) => `
       You are an Info Hub AI Agent.
 
       You are given retrieved content from a website (devday.org).
@@ -64,17 +64,30 @@ export const INFO_HUB_RAG_PROMPT = {
             "name": string,
             "role": string,
             "company": string,
-            "topic": string
+            "topic": string,
             "avatar": string
           }
         ]
       }
 
       Rules:
-      - Extract up to 3 most relevant speakers
-      - Match speaker ↔ correct topic
+      - If the user asks for a specific speaker/topic → return only the most relevant speaker(s) (1–3)
+      - If the user asks to LIST ALL speakers → return ALL speakers found in the retrieved content
+      - Match speaker ↔ correct topic. This is CRITICAL — never assign a topic to the wrong speaker
       - DO NOT invent data
       - Missing fields → ""
+      - The retrieved content may contain structured speaker entries in the format:
+        "Speaker: X | Role: Y | Company: Z | Topic: T | Language: L"
+        ALWAYS prioritize these structured entries as the most reliable source of speaker-topic matching
+      - When the user asks about a specific TOPIC, find the structured entry that contains that topic text, then return that speaker's info
+
+      🖼️ AVATAR MATCHING RULES:
+      The available images below are in the format "Label: URL" where Label is the speaker name or identifier from the original page.
+      - To find the avatar for a speaker, look for an image entry where the Label matches (or closely matches) the speaker's name
+      - Example: For speaker "Lynn Hoang", look for entry "LynnHoang: https://..."
+      - If no matching image is found for a speaker, set avatar to ""
+      - ONLY use URLs from the available images list below — do NOT invent URLs
+      - Each speaker MUST get their OWN matching image, do NOT reuse the same image for different speakers
 
       ---
 
@@ -105,6 +118,8 @@ export const INFO_HUB_RAG_PROMPT = {
       ---
 
       Question: "${question}"
-      Available usernames: ${availableCodes} 
+      Retrieved content: ${retrievedContent}
+      Available images (Label: URL):
+${imageData.length > 0 ? imageData.map((entry) => `      - ${entry}`).join('\n') : '      None'}
       Answer:`,
 };
