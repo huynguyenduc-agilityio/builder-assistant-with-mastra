@@ -42,11 +42,55 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
-      ### 2. GENERAL_QUERY
-      All other cases / Các trường hợp còn lại
+      ### 2. CONTACT_US_QUERY
+      If the question:
+      - asks how to contact DevDay / liên hệ DevDay
+      - asks for contact information / thông tin liên hệ
+      - asks for email, phone number, social media of DevDay / email, số điện thoại, mạng xã hội
+      - asks how to reach the organizers / liên hệ ban tổ chức
+      - asks about support channels / kênh hỗ trợ
 
       Vietnamese examples:
-      - "DevDay tổ chức ở đâu?" → GENERAL_QUERY
+      - "Làm sao để liên hệ DevDay?" → CONTACT_US_QUERY
+      - "Email liên hệ ban tổ chức là gì?" → CONTACT_US_QUERY
+      - "Tôi muốn liên hệ với DevDay" → CONTACT_US_QUERY
+      - "Có số điện thoại nào để hỏi thông tin không?" → CONTACT_US_QUERY
+
+      English examples:
+      - "How can I contact DevDay?" → CONTACT_US_QUERY
+      - "What is the organizer's email?" → CONTACT_US_QUERY
+
+      ---
+
+      ### 3. VENUE_QUERY
+      If the question:
+      - asks about the event venue / địa điểm tổ chức
+      - asks where DevDay is held / DevDay tổ chức ở đâu
+      - asks for the event location or address / địa chỉ
+      - asks when DevDay takes place / khi nào tổ chức
+      - asks about event date or time / ngày giờ tổ chức
+      - asks about directions or how to get there / cách đi đến
+      - asks about the event map / bản đồ
+      - asks "where and when" / "ở đâu và khi nào"
+
+      Vietnamese examples:
+      - "DevDay tổ chức ở đâu?" → VENUE_QUERY
+      - "DevDay tổ chức khi nào?" → VENUE_QUERY
+      - "Địa điểm và thời gian tổ chức?" → VENUE_QUERY
+      - "Cho tôi địa chỉ nơi tổ chức" → VENUE_QUERY
+      - "Ngày nào diễn ra sự kiện?" → VENUE_QUERY
+
+      English examples:
+      - "Where and when is DevDay held?" → VENUE_QUERY
+      - "What is the event date?" → VENUE_QUERY
+      - "What is the event venue address?" → VENUE_QUERY
+
+      ---
+
+      ### 4. GENERAL_QUERY
+      All other cases that do NOT match the above intents / Các trường hợp còn lại
+
+      Vietnamese examples:
       - "Lịch trình sự kiện như thế nào?" → GENERAL_QUERY
       - "DevDay là gì?" → GENERAL_QUERY
 
@@ -91,6 +135,49 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
+      ### ✅ Case: CONTACT_US_QUERY
+
+      Return structured JSON:
+
+      {
+        "email": string,
+        "hotline": string,
+        "phone": string,
+        "note": string
+      }
+
+      Rules:
+      - Extract ALL contact information found in the retrieved content
+      - DO NOT invent data — only use information from the retrieved content
+      - Missing fields → ""
+      - "hotline" is the main office line (e.g., "(+84) 236 710 9123 - Ext: 143")
+      - "phone" can contain multiple personal phone numbers with contact person names (e.g., "(+84) 372 033 088 (Ms. Dao), (+84) 839 476 134 (Ms. Ha)")
+      - "note" can contain additional context (e.g., office hours, preferred contact method)
+
+      ---
+
+      ### ✅ Case: VENUE_QUERY
+
+      Return structured JSON:
+
+      {
+        "venueName": string,
+        "address": string,
+        "date": string,
+        "mapUrl": string,
+        "note": string
+      }
+
+      Rules:
+      - Extract venue/location and event date information from the retrieved content
+      - DO NOT invent data — only use information from the retrieved content
+      - Missing fields → ""
+      - "date" should include the event date (e.g., "April 12th, 2025")
+      - "mapUrl" should be a Google Maps link if available in the retrieved content
+      - "note" can contain additional context (e.g., nearby landmarks, event floor)
+
+      ---
+
       ### ✅ Case: GENERAL_QUERY
 
       Return natural language answer (1–3 sentences)
@@ -110,7 +197,7 @@ export const INFO_HUB_RAG_PROMPT = {
       ---
 
       ⚠️ IMPORTANT:
-      - NEVER return text for SPEAKER_RELATED_QUERY
+      - NEVER return text for SPEAKER_RELATED_QUERY, CONTACT_US_QUERY, or VENUE_QUERY
       - NEVER return JSON for GENERAL_QUERY
       - DO NOT hallucinate
       - ALWAYS respond in the same language as the question
@@ -123,3 +210,4 @@ export const INFO_HUB_RAG_PROMPT = {
 ${imageData.length > 0 ? imageData.map((entry) => `      - ${entry}`).join('\n') : '      None'}
       Answer:`,
 };
+
