@@ -87,12 +87,33 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
-      ### 4. GENERAL_QUERY
+      ### 4. AGENDA_QUERY
+      If the question:
+      - asks about the event schedule or agenda / lịch trình sự kiện
+      - asks what happens at a specific time / lúc đó có gì
+      - asks about workshops, panels, keynotes / hội thảo, panel, keynote
+      - asks about morning/afternoon sessions / buổi sáng, buổi chiều
+      - asks about the event program / chương trình sự kiện
+
+      Vietnamese examples:
+      - "Lịch trình sự kiện như thế nào?" → AGENDA_QUERY
+      - "Lúc 10h30 có gì?" → AGENDA_QUERY
+      - "Buổi sáng có workshop nào?" → AGENDA_QUERY
+      - "Có những panel discussion nào?" → AGENDA_QUERY
+
+      English examples:
+      - "What is the event schedule?" → AGENDA_QUERY
+      - "What sessions are in the morning?" → AGENDA_QUERY
+      - "What happens at 10:30 AM?" → AGENDA_QUERY
+
+      ---
+
+      ### 5. GENERAL_QUERY
       All other cases that do NOT match the above intents / Các trường hợp còn lại
 
       Vietnamese examples:
-      - "Lịch trình sự kiện như thế nào?" → GENERAL_QUERY
       - "DevDay là gì?" → GENERAL_QUERY
+      - "DevDay có bao nhiêu người tham gia?" → GENERAL_QUERY
 
       ---
 
@@ -178,6 +199,33 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
+      ### ✅ Case: AGENDA_QUERY
+
+      Return structured JSON array:
+
+      [
+        {
+          "time": string,
+          "title": string,
+          "speaker": string,
+          "room": string,
+          "language": string
+        }
+      ]
+
+      Rules:
+      - Extract agenda/schedule information from the retrieved content
+      - DO NOT invent data — only use information from the retrieved content
+      - Missing fields → ""
+      - If the user asks for the overall schedule → return the main time blocks (Opening, Panel, Workshop, Lunch, Closing, etc.) without individual parallel sessions
+      - If the user asks about a specific time slot → return detailed sessions at that time, including parallel workshops
+      - If the user asks about a type of session (panel, workshop, keynote) → return all matching sessions
+      - "speaker" should include the speaker name and company if available (e.g., "Nguyen Phong Son - Orient Software")
+      - "room" is the room number or location name (e.g., "603", "Main Hall")
+      - "language" is the session language (e.g., "EN", "VN", "EN & VN")
+
+      ---
+
       ### ✅ Case: GENERAL_QUERY
 
       Return natural language answer (1–3 sentences)
@@ -197,7 +245,7 @@ export const INFO_HUB_RAG_PROMPT = {
       ---
 
       ⚠️ IMPORTANT:
-      - NEVER return text for SPEAKER_RELATED_QUERY, CONTACT_US_QUERY, or VENUE_QUERY
+      - NEVER return text for SPEAKER_RELATED_QUERY, CONTACT_US_QUERY, VENUE_QUERY, or AGENDA_QUERY
       - NEVER return JSON for GENERAL_QUERY
       - DO NOT hallucinate
       - ALWAYS respond in the same language as the question
