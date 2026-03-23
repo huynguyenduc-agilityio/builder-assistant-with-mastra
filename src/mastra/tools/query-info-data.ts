@@ -3,12 +3,12 @@ import { z } from 'zod';
 import type { QueryResult } from '@mastra/core/vector';
 import { OpenAI } from 'openai';
 
+import { summarizeText, normalizeWixUrl } from '../utils';
+import { IMAGE_URLS_DELIMITER, VIETNAMESE_PATTERN } from '../constants';
 import { INFO_HUB_PROMPT } from '../constants/infoHub/prompts';
 import { cloudflareVector, infoHubStoreIndexName } from '../storages';
 import { InfoHubKnowledgeStore } from '../agents/infoHub/info-hub-knowledge-store';
-import { summarizeText } from '../utils';
 import { INFO_HUB_RAG_PROMPT } from '../agents/rag/constants/infoHub-rag-prompt';
-import { VIETNAMESE_PATTERN } from '../constants';
 
 export const queryInfoDataTool = createTool({
   id: INFO_HUB_PROMPT.queryInfoDataTool.key,
@@ -57,12 +57,53 @@ const translateQueryForSearch = async (
       completion.choices[0]?.message?.content || query
     ).trim();
 
-
     return { originalQuery: query, searchQuery: translated };
   } catch (error) {
     console.warn('[queryInfoData] Translation failed, using original query:', error);
     return { originalQuery: query, searchQuery: query };
   }
+};
+
+/**
+ * Collect image data from vector query results metadata.
+ * Metadata stores images as "alt1|url1;;;alt2|url2" format (;;; separator to avoid
+ * conflicts with commas in Wix URLs like "w_175,h_175,al_c,q_80,...").
+ * Returns structured entries like "SpeakerName: https://..." for LLM matching.
+ * All wixstatic URLs are normalized at this point to ensure they load correctly.
+ */
+const collectImageData = (results: QueryResult[]): string[] => {
+  const entries = new Map<string, string>();
+
+  for (const item of results) {
+    const imageUrls = item?.metadata?.imageUrls as string | undefined;
+    if (!imageUrls) continue;
+
+    // Use IMAGE_URLS_DELIMITER as primary delimiter (new format); fall back to ',' for legacy data
+    const delimiter = imageUrls.includes(IMAGE_URLS_DELIMITER) ? IMAGE_URLS_DELIMITER : ',';
+    for (const entry of imageUrls.split(delimiter)) {
+      const trimmed = entry.trim();
+      if (!trimmed) continue;
+
+      const pipeIndex = trimmed.indexOf('|');
+      if (pipeIndex > 0) {
+        // Structured format: "alt|url"
+        const label = trimmed.substring(0, pipeIndex).trim();
+        const rawUrl = trimmed.substring(pipeIndex + 1).trim();
+        const url = normalizeWixUrl(rawUrl);
+        if (url && !entries.has(url)) {
+          entries.set(url, label ? `${label}: ${url}` : url);
+        }
+      } else {
+        // Legacy format: just URL
+        const url = normalizeWixUrl(trimmed);
+        if (!entries.has(url)) {
+          entries.set(url, url);
+        }
+      }
+    }
+  }
+
+  return [...entries.values()];
 };
 
 const queryInfoDataToolExecute = async ({ query }: { query?: string }) => {
@@ -89,11 +130,14 @@ const queryInfoDataToolExecute = async ({ query }: { query?: string }) => {
       .map((item) => item?.metadata?.text)
       .join('\n');
 
+    // Collect image data (alt|url pairs) from the retrieved chunks' metadata
+    const imageData = collectImageData(results);
+
     // Use the ORIGINAL query in the RAG prompt so it responds in the user's language
     const answer = await summarizeText(
       '', // Already combined in prompt
       '', // Already combined in prompt
-      INFO_HUB_RAG_PROMPT.answer_prompt(originalQuery, formalizedResults),
+      INFO_HUB_RAG_PROMPT.answer_prompt(originalQuery, formalizedResults, imageData),
     );
 
     let parsed;
