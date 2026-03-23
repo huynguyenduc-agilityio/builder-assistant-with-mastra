@@ -1,26 +1,13 @@
-import { CloudflareVector } from '@mastra/vectorize';
 import { embedMany } from 'ai';
 
-import { customEmbeddingProvider } from '../custom-provider';
-
-// Types
 import { chunkDocFromText } from '@/mastra/utils';
+import type { CreateKnowledgeStoreFromHtmlParams } from '@/mastra/types';
+import { IMAGE_URLS_DELIMITER } from '@/mastra/constants';
 
-const stripHtmlTags = (html: string) => {
-  const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, '');
-  const withoutStyles = withoutScripts.replace(/<style[\s\S]*?<\/style>/gi, '');
-  const withoutTags = withoutStyles.replace(/<\/?[^>]+(>|$)/g, ' ');
-  const normalizedWhitespace = withoutTags.replace(/\s+/g, ' ').trim();
-  return normalizedWhitespace;
-};
-
-type CreateKnowledgeStoreFromHtmlParams = {
-  url?: string;
-  html?: string;
-  indexName: string;
-  cloudflareVectorStore: CloudflareVector;
-  log?: boolean;
-};
+import { customEmbeddingProvider } from '../custom-provider';
+import { stripHtmlTags, stripHtmlPreserveLines, cleanTextContent } from './html';
+import { extractImagesFromHtml, associateImagesWithChunks } from './image';
+import { extractStructuredSpeakerChunks } from './speaker';
 
 export const createKnowledgeStoreFromHtml = async ({
   url,
@@ -43,13 +30,34 @@ export const createKnowledgeStoreFromHtml = async ({
       return res.text();
     })());
 
-  const text = stripHtmlTags(rawHtml);
+  // Extract images BEFORE stripping HTML tags
+  const images = extractImagesFromHtml(rawHtml);
 
-  if (!text) {
+  if (log) {
+    console.log(`0. Extracted ${images.length} images from HTML`);
+    images.slice(0, 5).forEach((img, i) => {
+      console.log(`   [${i}] alt="${img.alt}" filename="${img.filename}" src=${img.src.substring(0, 100)}...`);
+    });
+  }
+
+  const rawText = stripHtmlTags(rawHtml);
+
+  if (!rawText) {
     throw new Error('No text content extracted from HTML');
   }
 
+  // Clean text: remove irrelevant sections (partners, footer)
+  const text = cleanTextContent(rawText);
+
+  // Use line-preserving strip for structured speaker extraction
+  const textWithLines = stripHtmlPreserveLines(rawHtml);
+
+  // Extract structured speaker chunks from the AGENDA section
+  const speakerChunks = extractStructuredSpeakerChunks(textWithLines);
+
   if (log) {
+    console.log(`0.5. Extracted ${speakerChunks.length} structured speaker entries`);
+    speakerChunks.slice(0, 3).forEach((s, i) => console.log(`   [${i}] ${s}`));
     console.log('1. Started creating knowledge store from HTML...');
   }
 
@@ -62,10 +70,25 @@ export const createKnowledgeStoreFromHtml = async ({
     console.log(`2. Created index ${indexName}`);
   }
 
-  const chunks = await chunkDocFromText(text, log);
+  // Chunk the cleaned general text
+  const generalChunks = await chunkDocFromText(text, log);
+
+  // Prepend structured speaker chunks (each one is its own chunk)
+  const speakerChunkObjects = speakerChunks.map((text) => ({ text }));
+  const allChunks = [...speakerChunkObjects, ...generalChunks];
 
   if (log) {
-    console.log(`3. Chunked HTML text, total chunks: ${chunks.length}`);
+    console.log(`3. Total chunks: ${speakerChunkObjects.length} speaker + ${generalChunks.length} general = ${allChunks.length}`);
+  }
+
+  // Associate extracted images with ALL chunks
+  const chunkImageData = associateImagesWithChunks(allChunks, images);
+
+  if (log) {
+    const chunksWithImages = chunkImageData.filter((d) => d.length > 0).length;
+    console.log(
+      `3.1. Associated images: ${chunksWithImages}/${allChunks.length} chunks have images`,
+    );
   }
 
   const { embeddings } = await embedMany({
@@ -74,21 +97,22 @@ export const createKnowledgeStoreFromHtml = async ({
       formalizeData: (values: string[] | string) => values as string,
       log,
     }),
-    values: chunks?.map((chunk: any) => chunk.text),
+    values: allChunks.map((chunk: any) => chunk.text),
   });
 
   await cloudflareVectorStore.upsert({
     indexName,
     vectors: embeddings,
-    metadata: chunks.map((chunk: any) => ({
+    metadata: allChunks.map((chunk: any, index: number) => ({
       text: chunk.text,
       source: url || `html-${indexName}`,
+      imageUrls: chunkImageData[index]?.join(IMAGE_URLS_DELIMITER) || '',
     })),
   });
 
   if (log) {
     console.log(
-      `4. All HTML chunks (${chunks.length}) embedded and upserted successfully!!`,
+      `4. All chunks (${allChunks.length}) embedded and upserted successfully!!`,
     );
   }
 };
