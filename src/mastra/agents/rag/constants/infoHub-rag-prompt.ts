@@ -164,7 +164,7 @@ export const INFO_HUB_RAG_PROMPT = {
       Return structured JSON:
 
       {
-        "type": "${InfoHubResponseType.CONTACT}",
+        "type": "${InfoHubResponseType.CONTACT_US}",
         "data": {
           "email": string,
           "hotline": string,
