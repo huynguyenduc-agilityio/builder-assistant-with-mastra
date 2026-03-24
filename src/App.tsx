@@ -2,8 +2,18 @@ import { MastraReactProvider } from '@mastra/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
+// Constants
 import { MASTRA_BASE_URL } from '@/constants';
-import { Layout, ThemeProvider, AuthProvider, ProtectedRoute } from '@/components';
+
+// Components
+import {
+  Layout,
+  ThemeProvider,
+  AuthProvider,
+  ProtectedRoute,
+} from '@/components';
+
+// Pages
 import { Chat, Login } from '@/pages';
 
 export default function Page() {
@@ -35,4 +45,3 @@ export default function Page() {
     </ThemeProvider>
   );
 }
-

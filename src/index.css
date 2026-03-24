@@ -1,56 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --animate-shimmer: shimmer-sweep var(--shimmer-duration, 1000ms) linear
-    infinite both;
-  @keyframes shimmer-sweep {
-    from {
-      background-position: 150% 0;
-    }
-    to {
-      background-position: -100% 0;
-    }
-  }
+@theme {
+  --font-syne: 'Syne', sans-serif;
+  --font-dm-sans: 'DM Sans', sans-serif;
 }
 
+/* ── Design tokens ── */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -120,25 +80,156 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* ── Base ── */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 .list-inside {
   list-style-position: inside;
 }
 
+/* ── Animations ── */
+@keyframes blob1 {
+  0%   { transform: translate(0vw,   0vh)   scale(1);    }
+  12%  { transform: translate(55vw,  5vh)   scale(1.1);  }
+  25%  { transform: translate(72vw,  42vh)  scale(0.95); }
+  38%  { transform: translate(58vw,  80vh)  scale(1.15); }
+  50%  { transform: translate(18vw,  82vh)  scale(1.05); }
+  63%  { transform: translate(-8vw,  55vh)  scale(0.9);  }
+  76%  { transform: translate(8vw,   22vh)  scale(1.08); }
+  88%  { transform: translate(38vw,  8vh)   scale(0.97); }
+  100% { transform: translate(0vw,   0vh)   scale(1);    }
+}
+@keyframes blob2 {
+  0%   { transform: translate(0vw,    0vh)   scale(1);    }
+  14%  { transform: translate(-10vw,  38vh)  scale(1.08); }
+  28%  { transform: translate(22vw,   72vh)  scale(0.93); }
+  42%  { transform: translate(68vw,   78vh)  scale(1.12); }
+  56%  { transform: translate(82vw,   28vh)  scale(0.96); }
+  70%  { transform: translate(52vw,   -8vh)  scale(1.1);  }
+  85%  { transform: translate(18vw,   12vh)  scale(1.02); }
+  100% { transform: translate(0vw,    0vh)   scale(1);    }
+}
+@keyframes blob3 {
+  0%   { transform: translate(0vw,    0vh)   scale(1);    }
+  16%  { transform: translate(32vw,  -10vh)  scale(1.06); }
+  32%  { transform: translate(75vw,   18vh)  scale(0.94); }
+  48%  { transform: translate(70vw,   68vh)  scale(1.1);  }
+  60%  { transform: translate(30vw,   85vh)  scale(1.04); }
+  74%  { transform: translate(-8vw,   48vh)  scale(0.92); }
+  88%  { transform: translate(5vw,    8vh)   scale(1.08); }
+  100% { transform: translate(0vw,    0vh)   scale(1);    }
+}
+@keyframes headerGlow {
+  0%, 100% { box-shadow: 0 0 14px rgba(139,92,246,0.35); }
+  50%       { box-shadow: 0 0 26px rgba(6,182,212,0.45);  }
+}
+@keyframes tdot {
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.4; }
+  30%           { transform: translateY(-5px); opacity: 1;   }
+}
+
+/* ── Noise texture ── */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── CopilotKit overrides ── */
+.copilotKitMessages,
+.copilotKitChat {
+  background-color: transparent !important;
+}
+
+.copilotKitWindow {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.copilotKitHeader,
+.copilotKitBranding,
+.copilotKitInputContainer,
+.copilotKitSuggestionsContainer {
+  display: none !important;
+}
+
 .copilotKitMessagesContainer {
+  margin-top: 24px;
+  margin-bottom: 100px;
   padding: 0 !important;
+  background-color: transparent !important;
+  width: 100% !important;
+  max-width: 768px !important;
+  margin-inline: auto !important;
+  padding-inline: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
 }
 
 .copilotKitMessagesFooter {
   width: 100% !important;
   padding: 0.75rem 0 !important;
   margin: 8px auto 0 auto;
+}
+
+.copilotKitScrollContainer {
+  background: transparent !important;
+  width: 100% !important;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding-bottom: 160px !important;
+  padding-top: 28px !important;
+}
+
+.copilotKitScrollContainer::-webkit-scrollbar       { width: 3px; }
+.copilotKitScrollContainer::-webkit-scrollbar-track { background: transparent; }
+.copilotKitScrollContainer::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(100,80,200,0.18);
+}
+.dark .copilotKitScrollContainer::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ── WelcomeScreen ── */
+body.welcome-active .copilotKitScrollContainer,
+body.welcome-active .copilot-input-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.welcome-active .copilot-input-bar {
+  transform: translateY(8px) !important;
+}
+body:not(.welcome-active) .copilotKitScrollContainer {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.15s;
+}
+body:not(.welcome-active) .copilot-input-bar {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+  transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+}
+
+/* ── Misc ── */
+cpk-web-inspector {
+  display: none !important;
+}
+
+/* ── Textarea scrollbar (CustomInput) ── */
+#chat-input::-webkit-scrollbar       { width: 3px; }
+#chat-input::-webkit-scrollbar-track { background: transparent; }
+#chat-input::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(100,80,200,0.25);
+}
+.dark #chat-input::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
 }

@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 export type Theme = 'dark' | 'light' | 'system';
 
@@ -14,3 +14,12 @@ const initialState: ThemeProviderState = {
 
 export const ThemeProviderContext =
   createContext<ThemeProviderState>(initialState);
+
+export const useTheme = (): ThemeProviderState =>
+  useContext(ThemeProviderContext);
+
+// Returns true if dark, falls back to OS preference when theme is 'system'
+export const resolveIsDark = (theme: Theme): boolean =>
+  theme === 'dark' ||
+  (theme === 'system' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches);
