@@ -17,7 +17,7 @@ import { SendIcon } from './icons';
 import { combineClasses } from '@/utils';
 
 // Constants
-import { COPILOT_LABEL, KEYBOARD_EVENT } from '@/constants';
+import { CHAT_SUGGESTIONS, COPILOT_LABEL, KEYBOARD_EVENT } from '@/constants';
 
 const MAX_HEIGHT = 150;
 
@@ -98,7 +98,21 @@ export const CustomInput = ({ inProgress }: InputProps) => {
       ref={barRef}
       className="copilot-input-bar fixed bottom-0 left-0 right-0 z-20 py-4 px-4 transition-all duration-300 border-t shadow-[0_-1px_0_rgba(255,255,255,0.04),0_-8px_32px_rgba(0,0,0,0.15)] bg-white/55 border-[rgba(100,80,200,0.2)] backdrop-blur-[28px] dark:bg-white/[.04] dark:border-white/[.08]"
     >
-      <div className="w-full max-w-[768px] mx-auto">
+      <div className="w-full max-w-[768px] mx-auto flex flex-col gap-2">
+        {/* Suggestion chips */}
+        <div className="flex flex-wrap gap-2">
+          {CHAT_SUGGESTIONS.map(({ title, message }) => (
+            <button
+              key={title}
+              onClick={() => handleSubmit(message)}
+              disabled={inProgress}
+              className="text-xs px-3 py-1.5 rounded-[12px] border cursor-pointer transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed font-dm-sans whitespace-nowrap border-[rgba(100,80,200,0.25)] text-[rgba(60,40,140,0.75)] bg-white/60 hover:bg-[rgba(124,58,237,0.12)] hover:border-[rgba(139,92,246,0.5)] hover:text-[#3b2a8a] dark:bg-white/[.06] dark:border-white/[.15] dark:text-white/60 dark:hover:bg-[rgba(124,58,237,0.2)] dark:hover:border-[rgba(139,92,246,0.5)] dark:hover:text-white/90"
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+
         {/* Input card */}
         <div className="flex w-full items-center gap-3 px-[18px] py-[11px] rounded-[18px] transition-all duration-200 backdrop-blur-xl border focus-within:border-[rgba(139,92,246,0.55)] bg-white/75 border-[rgba(100,80,200,0.2)] shadow-[0_4px_24px_rgba(100,80,200,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] dark:bg-white/[.06] dark:border-white/[.11] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.07)]">
           <textarea
