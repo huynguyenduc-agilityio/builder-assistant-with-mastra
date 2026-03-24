@@ -1,3 +1,5 @@
+import { InfoHubResponseType } from "@/mastra/types";
+
 export const INFO_HUB_RAG_PROMPT = {
   answer_prompt: (question: string, retrievedContent = '', imageData: string[] = []) => `
       You are an Info Hub AI Agent.
@@ -124,7 +126,8 @@ export const INFO_HUB_RAG_PROMPT = {
       Return structured JSON:
 
       {
-        [
+        "type": "${InfoHubResponseType.SPEAKER}",
+        "data": [
           {
             "name": string,
             "role": string,
@@ -161,10 +164,13 @@ export const INFO_HUB_RAG_PROMPT = {
       Return structured JSON:
 
       {
-        "email": string,
-        "hotline": string,
-        "phone": string,
-        "note": string
+        "type": "${InfoHubResponseType.CONTACT}",
+        "data": {
+          "email": string,
+          "hotline": string,
+          "phone": string,
+          "note": string
+        }
       }
 
       Rules:
@@ -182,11 +188,14 @@ export const INFO_HUB_RAG_PROMPT = {
       Return structured JSON:
 
       {
-        "venueName": string,
-        "address": string,
-        "date": string,
-        "mapUrl": string,
-        "note": string
+        "type": "${InfoHubResponseType.VENUE}",
+        "data": {
+          "venueName": string,
+          "address": string,
+          "date": string,
+          "mapUrl": string,
+          "note": string
+        }
       }
 
       Rules:
@@ -201,17 +210,20 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ### ✅ Case: AGENDA_QUERY
 
-      Return structured JSON array:
+      Return structured JSON:
 
-      [
-        {
-          "time": string,
-          "title": string,
-          "speaker": string,
-          "room": string,
-          "language": string
-        }
-      ]
+      {
+        "type": "${InfoHubResponseType.AGENDA}",
+        "data": [
+          {
+            "time": string,
+            "title": string,
+            "speaker": string,
+            "room": string,
+            "language": string
+          }
+        ]
+      }
 
       Rules:
       - Extract agenda/schedule information from the retrieved content
@@ -235,18 +247,15 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ### ❌ Case: No relevant info
 
-      Return:
-
-      {
-        "type": "not_found",
-        "data": []
-      }
+      Return a plain text response informing the user that no relevant information was found.
+      ⚠️ Answer in the SAME language as the question (Vietnamese or English)
 
       ---
 
       ⚠️ IMPORTANT:
-      - NEVER return text for SPEAKER_RELATED_QUERY, CONTACT_US_QUERY, VENUE_QUERY, or AGENDA_QUERY
-      - NEVER return JSON for GENERAL_QUERY
+      - ALWAYS include "type" field in every structured response so the frontend can identify and show the correct card
+      - Valid type values: "${InfoHubResponseType.SPEAKER}", "${InfoHubResponseType.CONTACT_US}", "${InfoHubResponseType.VENUE}", "${InfoHubResponseType.AGENDA}"
+      - For GENERAL_QUERY or when no relevant info is found, return plain text WITHOUT JSON wrapper
       - DO NOT hallucinate
       - ALWAYS respond in the same language as the question
 
