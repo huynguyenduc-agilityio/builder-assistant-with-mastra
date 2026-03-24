@@ -21,7 +21,6 @@ import {
 
 // Constants
 import {
-  // CHAT_SUGGESTIONS,
   COPILOT_LABEL,
   MASTRA_BASE_URL,
   SPEAKER_NAME,
@@ -168,7 +167,6 @@ const Chat = () => {
         labels={{ title: COPILOT_LABEL.TITLE }}
         UserMessage={UserMessage}
         AssistantMessage={AssistantMessage}
-        // suggestions={CHAT_SUGGESTIONS}
         Input={CustomInput}
         className="h-full w-full flex flex-col overflow-hidden bg-transparent [&_.copilotKitHeader]:hidden [&_.copilotKitBranding]:hidden"
       />
