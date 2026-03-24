@@ -154,8 +154,7 @@ const queryInfoDataToolExecute = async ({ query }: { query?: string }) => {
     }
 
     if (parsed) {
-      const data = Array.isArray(parsed) ? parsed : (parsed.data ?? parsed);
-      return JSON.stringify(data);
+      return JSON.stringify(parsed);
     }
 
     return answer;
