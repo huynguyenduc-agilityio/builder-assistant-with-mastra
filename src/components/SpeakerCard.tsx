@@ -29,7 +29,7 @@ export const SpeakerCard = ({ speaker, index }: SpeakerCardProps) => {
       {/* Subtle top accent line */}
       <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-violet-400/40 to-transparent dark:via-violet-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="p-4">
+      <div className="p-4 bg-white/80 dark:bg-white/[.08]">
         {/* Header row */}
         <div className="flex items-center gap-3 mb-3">
           {/* Avatar */}
