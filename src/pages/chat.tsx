@@ -195,15 +195,15 @@ const ChatBotCopilotKit = () => {
       <div className="noise-overlay fixed inset-0 pointer-events-none z-[1] opacity-[0.06] dark:opacity-[0.16]" />
 
       <div className="relative z-[2] w-full h-dvh flex flex-col overflow-hidden">
-        <Header />
-        <div className="flex-1 overflow-hidden">
-          <CopilotKit
-            runtimeUrl={`${MASTRA_BASE_URL}/copilotkit`}
-            agent="infoHubAgent"
-          >
+        <CopilotKit
+          runtimeUrl={`${MASTRA_BASE_URL}/copilotkit`}
+          agent="infoHubAgent"
+        >
+          <Header />
+          <div className="flex-1 overflow-hidden">
             <Chat />
-          </CopilotKit>
-        </div>
+          </div>
+        </CopilotKit>
       </div>
     </>
   );
