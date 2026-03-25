@@ -5,7 +5,11 @@ import type { CreateKnowledgeStoreFromHtmlParams } from '@/mastra/types';
 import { IMAGE_URLS_DELIMITER } from '@/mastra/constants';
 
 import { customEmbeddingProvider } from '../custom-provider';
-import { stripHtmlTags, stripHtmlPreserveLines, cleanTextContent } from './html';
+import {
+  stripHtmlTags,
+  stripHtmlPreserveLines,
+  cleanTextContent,
+} from './html';
 import { extractImagesFromHtml, associateImagesWithChunks } from './image';
 import { extractStructuredSpeakerChunks } from './speaker';
 
@@ -36,7 +40,9 @@ export const createKnowledgeStoreFromHtml = async ({
   if (log) {
     console.log(`0. Extracted ${images.length} images from HTML`);
     images.slice(0, 5).forEach((img, i) => {
-      console.log(`   [${i}] alt="${img.alt}" filename="${img.filename}" src=${img.src.substring(0, 100)}...`);
+      console.log(
+        `   [${i}] alt="${img.alt}" filename="${img.filename}" src=${img.src.substring(0, 100)}...`,
+      );
     });
   }
 
@@ -56,7 +62,9 @@ export const createKnowledgeStoreFromHtml = async ({
   const speakerChunks = extractStructuredSpeakerChunks(textWithLines);
 
   if (log) {
-    console.log(`0.5. Extracted ${speakerChunks.length} structured speaker entries`);
+    console.log(
+      `0.5. Extracted ${speakerChunks.length} structured speaker entries`,
+    );
     speakerChunks.slice(0, 3).forEach((s, i) => console.log(`   [${i}] ${s}`));
     console.log('1. Started creating knowledge store from HTML...');
   }
@@ -78,7 +86,9 @@ export const createKnowledgeStoreFromHtml = async ({
   const allChunks = [...speakerChunkObjects, ...generalChunks];
 
   if (log) {
-    console.log(`3. Total chunks: ${speakerChunkObjects.length} speaker + ${generalChunks.length} general = ${allChunks.length}`);
+    console.log(
+      `3. Total chunks: ${speakerChunkObjects.length} speaker + ${generalChunks.length} general = ${allChunks.length}`,
+    );
   }
 
   // Associate extracted images with ALL chunks
@@ -93,7 +103,7 @@ export const createKnowledgeStoreFromHtml = async ({
 
   const { embeddings } = await embedMany({
     model: customEmbeddingProvider({
-      model: process.env.LLM_OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+      model: process.env.LLM_EMBEDDING_MODEL || 'openai/text-embedding-3-small',
       formalizeData: (values: string[] | string) => values as string,
       log,
     }),

@@ -14,7 +14,7 @@ export const infoHubAgent = (storage: D1Store) =>
     id: 'info-hub-agent',
     name: 'Info Hub Agent',
     instructions: INFO_HUB_PROMPT.instruction(),
-    model: 'openai/gpt-4o-mini',
+    model: process.env.LLM_MODEL || 'openrouter/openai/gpt-4o-mini',
     tools: {
       queryInfoDataTool,
       rateTool,

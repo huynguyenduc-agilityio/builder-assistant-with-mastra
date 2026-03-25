@@ -14,7 +14,10 @@ export const queryInfoDataTool = createTool({
   id: INFO_HUB_PROMPT.queryInfoDataTool.key,
   description: INFO_HUB_PROMPT.queryInfoDataTool.description,
   inputSchema: z.object({
-    query: z.string().optional().describe('User query (supports English and Vietnamese)'),
+    query: z
+      .string()
+      .optional()
+      .describe('User query (supports English and Vietnamese)'),
   }),
   execute: async ({ query }) => {
     return await queryInfoDataToolExecute({ query });
@@ -38,11 +41,12 @@ const translateQueryForSearch = async (
 
   try {
     const openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: process.env.OPENROUTER_API_KEY,
     });
 
     const completion = await openaiClient.chat.completions.create({
-      model: process.env.LLM_OPENAI_MODEL || 'gpt-4o-mini',
+      model: process.env.LLM_CHAT_MODEL || 'openai/gpt-4o-mini',
       messages: [
         {
           role: 'user',
@@ -59,7 +63,10 @@ const translateQueryForSearch = async (
 
     return { originalQuery: query, searchQuery: translated };
   } catch (error) {
-    console.warn('[queryInfoData] Translation failed, using original query:', error);
+    console.warn(
+      '[queryInfoData] Translation failed, using original query:',
+      error,
+    );
     return { originalQuery: query, searchQuery: query };
   }
 };
@@ -79,7 +86,9 @@ const collectImageData = (results: QueryResult[]): string[] => {
     if (!imageUrls) continue;
 
     // Use IMAGE_URLS_DELIMITER as primary delimiter (new format); fall back to ',' for legacy data
-    const delimiter = imageUrls.includes(IMAGE_URLS_DELIMITER) ? IMAGE_URLS_DELIMITER : ',';
+    const delimiter = imageUrls.includes(IMAGE_URLS_DELIMITER)
+      ? IMAGE_URLS_DELIMITER
+      : ',';
     for (const entry of imageUrls.split(delimiter)) {
       const trimmed = entry.trim();
       if (!trimmed) continue;
@@ -137,7 +146,11 @@ const queryInfoDataToolExecute = async ({ query }: { query?: string }) => {
     const answer = await summarizeText(
       '', // Already combined in prompt
       '', // Already combined in prompt
-      INFO_HUB_RAG_PROMPT.answer_prompt(originalQuery, formalizedResults, imageData),
+      INFO_HUB_RAG_PROMPT.answer_prompt(
+        originalQuery,
+        formalizedResults,
+        imageData,
+      ),
     );
 
     let parsed;
