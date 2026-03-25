@@ -1,2 +1,2 @@
 export * from './query-info-data';
-export * from './rate-speaker-topic';
+export * from './rate';

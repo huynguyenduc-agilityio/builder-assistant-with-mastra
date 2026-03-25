@@ -2,17 +2,21 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
 import { INFO_HUB_PROMPT } from '../constants/infoHub/prompts';
-import { SPEAKER_NAME, TOPIC_NAME } from '@/constants';
 import { submitRating, buildRatingStats } from '@/lib/ratings-service';
 
-export const rateSpeakerTopicTool = createTool({
-  id: INFO_HUB_PROMPT.rateSpeakerTopicTool.key,
-  description: INFO_HUB_PROMPT.rateSpeakerTopicTool.description,
+export const rateTool = createTool({
+  id: INFO_HUB_PROMPT.rateTool.key,
+  description: INFO_HUB_PROMPT.rateTool.description,
   inputSchema: z.object({
     target: z
       .enum(['speaker', 'topic'])
       .describe(
-        'What the user is rating: "speaker" for Huy Nguyen Duc, or "topic" for the session topic',
+        'What the user is rating: "speaker" for a speaker, or "topic" for a session topic',
+      ),
+    name: z
+      .string()
+      .describe(
+        'The name of the speaker or topic that the user wants to rate (provided dynamically by the user)',
       ),
     rating: z
       .number()
@@ -34,9 +38,10 @@ export const rateSpeakerTopicTool = createTool({
       .optional()
       .describe('The email of the logged-in reviewer'),
   }),
-  execute: async ({ target, rating, userId, userName, email }) => {
+  execute: async ({ target, name, rating, userId, userName, email }) => {
     return await rateSpeakerTopicExecute({
       target,
+      name,
       rating,
       userId,
       userName,
@@ -50,40 +55,47 @@ export const getRatingStatsTool = createTool({
   description: INFO_HUB_PROMPT.getRatingStatsTool.description,
   inputSchema: z.object({
     target: z
-      .enum(['speaker', 'topic', 'all'])
+      .enum(['speaker', 'topic'])
       .optional()
       .describe(
-        'Which ratings to retrieve stats for: "speaker", "topic", or "all" for both',
+        'What to retrieve stats for: "speaker" or "topic"',
+      ),
+    name: z
+      .string()
+      .optional()
+      .describe(
+        'The speaker or topic name to retrieve rating stats for.',
       ),
   }),
-  execute: async ({ target }) => {
-    return await getRatingStatsExecute({ target: target || 'all' });
+  execute: async ({ target, name }) => {
+    return await getRatingStatsExecute({ target, name });
   },
 });
 
 const rateSpeakerTopicExecute = async ({
   target,
+  name,
   rating,
   userId,
   userName,
   email,
 }: {
   target: 'speaker' | 'topic';
+  name: string;
   rating?: number;
   userId?: string;
   userName?: string;
   email?: string;
 }) => {
   try {
-    const resolvedName =
-      target === 'speaker' ? SPEAKER_NAME : TOPIC_NAME;
     const clampedRating = Math.round(Math.min(5, Math.max(1, rating || 5)));
     const resolvedUserName = userName || 'Anonymous';
+    const targetLabel = target === 'speaker' ? 'speaker' : 'topic';
 
     // Submit to Firestore
     const { entry, isUpdate } = await submitRating({
       type: target,
-      name: resolvedName,
+      name,
       rating: clampedRating,
       userId,
       userName,
@@ -91,17 +103,17 @@ const rateSpeakerTopicExecute = async ({
     });
 
     // Get updated summary from Firestore
-    const stats = await buildRatingStats(target, resolvedName);
+    const stats = await buildRatingStats(target, name);
 
     return JSON.stringify({
       success: true,
       message: isUpdate
-        ? `Your rating for ${target} "${resolvedName}" has been updated to ${clampedRating} star${clampedRating !== 1 ? 's' : ''}!`
-        : `Thank you, ${resolvedUserName}! You rated ${target} "${resolvedName}" ${clampedRating} star${clampedRating !== 1 ? 's' : ''}.`,
+        ? `Your rating for ${targetLabel} "${name}" has been updated to ${clampedRating} star${clampedRating !== 1 ? 's' : ''}!`
+        : `Thank you, ${resolvedUserName}! You rated ${targetLabel} "${name}" ${clampedRating} star${clampedRating !== 1 ? 's' : ''}.`,
       rating: entry,
       summary: {
         target,
-        name: resolvedName,
+        name,
         averageRating: stats.averageRating,
         totalReviewers: stats.totalReviewers,
       },
@@ -118,29 +130,25 @@ const rateSpeakerTopicExecute = async ({
 
 const getRatingStatsExecute = async ({
   target,
+  name,
 }: {
-  target: 'speaker' | 'topic' | 'all';
+  target?: 'speaker' | 'topic';
+  name?: string;
 }) => {
   try {
-    if (target === 'all') {
-      const [speakerStats, topicStats] = await Promise.all([
-        buildRatingStats('speaker', SPEAKER_NAME),
-        buildRatingStats('topic', TOPIC_NAME),
-      ]);
+    if (target && name) {
+      const stats = await buildRatingStats(target, name);
 
       return JSON.stringify({
         success: true,
-        speaker: speakerStats,
-        topic: topicStats,
+        ...stats,
       });
     }
 
-    const name = target === 'speaker' ? SPEAKER_NAME : TOPIC_NAME;
-    const stats = await buildRatingStats(target, name);
-
+    // If missing info, return a message asking for details
     return JSON.stringify({
-      success: true,
-      ...stats,
+      success: false,
+      message: 'Please specify the speaker or topic name you want to see ratings for.',
     });
   } catch (error: unknown) {
     console.error('getRatingStatsExecute error:', error);
