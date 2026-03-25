@@ -23,8 +23,6 @@ import {
 import {
   COPILOT_LABEL,
   MASTRA_BASE_URL,
-  SPEAKER_NAME,
-  TOPIC_NAME,
 } from '@/constants';
 
 // Types
@@ -46,9 +44,9 @@ const Chat = () => {
     },
   });
 
-  // Human-in-the-Loop: rateSpeakerTopicTool
+  // Human-in-the-Loop: rateTool
   useCopilotAction({
-    name: 'rateSpeakerTopicTool',
+    name: 'rateTool',
     available: 'disabled',
     parameters: [
       {
@@ -57,10 +55,16 @@ const Chat = () => {
         required: true,
         description: 'What the user is rating: "speaker" or "topic"',
       },
+      {
+        name: 'name',
+        type: 'string',
+        required: true,
+        description: 'The name of the speaker or topic that the user wants to rate',
+      },
     ],
     renderAndWait: ({ args, status, respond, result }) => {
-      const resolvedName =
-        args.target === 'speaker' ? SPEAKER_NAME : TOPIC_NAME;
+      const resolvedTarget = args.target || 'speaker';
+      const resolvedName = args.name || (resolvedTarget === 'speaker' ? 'Speaker' : 'Topic');
 
       const reviewerDisplayName = user?.displayName || 'Anonymous';
       const reviewerUserId = user?.uid || 'anonymous';
@@ -107,7 +111,7 @@ const Chat = () => {
 
         return (
           <RatingCard
-            target={args.target || 'speaker'}
+            target={resolvedTarget}
             name={resolvedName}
             rating={completedRating}
             reviewerName={reviewerDisplayName}
@@ -120,7 +124,7 @@ const Chat = () => {
       if (!respond) {
         return (
           <RatingCard
-            target={args.target || 'speaker'}
+            target={resolvedTarget}
             name={resolvedName}
             rating={0}
             reviewerName={reviewerDisplayName}
@@ -132,7 +136,7 @@ const Chat = () => {
       // During 'executing', show the interactive rating card
       return (
         <InteractiveRatingCard
-          target={args.target || 'speaker'}
+          target={resolvedTarget}
           name={resolvedName}
           reviewerName={reviewerDisplayName}
           userId={reviewerUserId}
@@ -152,7 +156,13 @@ const Chat = () => {
         name: 'target',
         type: 'string',
         required: false,
-        description: 'Which ratings to retrieve: "speaker", "topic", or "all"',
+        description: 'What to retrieve stats for: "speaker" or "topic"',
+      },
+      {
+        name: 'name',
+        type: 'string',
+        required: false,
+        description: 'The speaker or topic name to retrieve rating stats for',
       },
     ],
     render: ({ result, status }) => {

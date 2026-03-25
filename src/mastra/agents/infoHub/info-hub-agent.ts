@@ -5,7 +5,7 @@ import { Memory } from '@mastra/memory';
 import { INFO_HUB_PROMPT } from '../../constants';
 import {
   queryInfoDataTool,
-  rateSpeakerTopicTool,
+  rateTool,
   getRatingStatsTool,
 } from '@/mastra/tools';
 
@@ -17,7 +17,7 @@ export const infoHubAgent = (storage: D1Store) =>
     model: 'openai/gpt-4o-mini',
     tools: {
       queryInfoDataTool,
-      rateSpeakerTopicTool,
+      rateTool,
       getRatingStatsTool,
     },
     memory: new Memory({ storage }),
