@@ -26,5 +26,5 @@ export const SUGGESTIONS = [
   'How do I register?',
   'When and where is DevDay 2025?',
   'Who organized DevDay 2025?',
-  'What sessions are available?',
+  'Which speakers are from Axon Active?',
 ];
