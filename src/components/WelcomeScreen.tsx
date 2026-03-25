@@ -83,7 +83,7 @@ export const WelcomeScreen = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.2 } }}
           transition={{ duration: 0.25 }}
-          className="absolute inset-0 z-10 flex items-center justify-center px-4"
+          className="absolute inset-0 z-10 flex items-center justify-center px-4 pointer-events-none"
         >
           {/* Card */}
           <motion.div
@@ -97,7 +97,7 @@ export const WelcomeScreen = ({
               transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
             }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-[480px] rounded-[24px] p-8 flex flex-col items-center gap-6 backdrop-blur-[32px] border bg-white/60 border-[rgba(100,80,200,0.15)] shadow-[0_24px_64px_rgba(100,80,200,0.12),inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-white/[.05] dark:border-white/10 dark:shadow-[0_24px_64px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.1)]"
+            className="pointer-events-auto w-full max-w-[480px] rounded-[24px] p-8 flex flex-col items-center gap-6 backdrop-blur-[32px] border bg-white/60 border-[rgba(100,80,200,0.15)] shadow-[0_24px_64px_rgba(100,80,200,0.12),inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-white/[.05] dark:border-white/10 dark:shadow-[0_24px_64px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.1)]"
           >
             {/* Logo */}
             <motion.div

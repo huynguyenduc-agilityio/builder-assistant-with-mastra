@@ -127,7 +127,7 @@ export const CustomInput = ({ inProgress }: InputProps) => {
             aria-label="Chat message input"
             className={combineClasses(
               'flex-1 resize-none max-h-[150px] overflow-y-auto',
-              'text-md leading-[1.55] font-normal bg-transparent focus:outline-none border-none',
+              'text-sm sm:text-md leading-[1.55] font-normal bg-transparent focus:outline-none border-none',
               'disabled:opacity-50',
               'text-[#1e1040] caret-[rgba(124,58,237,0.8)] placeholder:text-[rgba(80,60,160,0.4)]',
               'dark:text-white/[.88] dark:caret-[rgba(139,92,246,0.9)] dark:placeholder:text-white/[.28]',
