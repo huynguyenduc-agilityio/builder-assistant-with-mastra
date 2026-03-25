@@ -6,16 +6,17 @@ export const summarizeText = async (
   prompt = '',
   maxTokens?: number,
 ) => {
-  // Generate title using LLM (using OpenAI SDK directly to avoid version conflicts)
+  // Generate using OpenRouter (OpenAI-compatible API)
   const openaiClient = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY,
   });
 
   // Use higher token limit when a custom prompt is provided (e.g. RAG answer prompt)
   const tokenLimit = maxTokens ?? (prompt ? 500 : 100);
 
   const completion = await openaiClient.chat.completions.create({
-    model: process.env.LLM_OPENAI_MODEL || 'gpt-4o-mini',
+    model: process.env.LLM_CHAT_MODEL || 'openai/gpt-4o-mini',
     messages: [
       {
         role: 'user',

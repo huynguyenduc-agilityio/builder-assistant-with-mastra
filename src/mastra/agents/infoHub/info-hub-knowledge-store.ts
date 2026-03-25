@@ -58,7 +58,7 @@ export class InfoHubKnowledgeStore {
       value: message,
       model: customEmbeddingProvider({
         model:
-          process.env.LLM_OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+          process.env.LLM_EMBEDDING_MODEL || 'openai/text-embedding-3-small',
         formalizeData: (values: string[] | string) => values as string,
         log: this.log,
       }),
