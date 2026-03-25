@@ -24,11 +24,11 @@ export const customEmbeddingProvider = ({
         console.log('Raw input', input);
       }
 
-      const response = await fetch('https://api.openai.com/v1/embeddings', {
+      const response = await fetch('https://openrouter.ai/api/v1/embeddings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
           input,
@@ -40,6 +40,16 @@ export const customEmbeddingProvider = ({
 
       if (log) {
         console.log('Embedded data', data);
+      }
+
+      if (!data.data) {
+        console.error(
+          '[customEmbeddingProvider] Embedding API error:',
+          JSON.stringify(data),
+        );
+        throw new Error(
+          `Embedding API failed: ${data.error?.message || JSON.stringify(data)}`,
+        );
       }
 
       return {

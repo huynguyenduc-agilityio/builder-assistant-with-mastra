@@ -20,10 +20,7 @@ import {
 } from '@/components';
 
 // Constants
-import {
-  COPILOT_LABEL,
-  MASTRA_BASE_URL,
-} from '@/constants';
+import { COPILOT_LABEL, MASTRA_BASE_URL } from '@/constants';
 
 // Types
 import { ACTION_HANDLER_STATUS } from '@/types';
@@ -59,12 +56,14 @@ const Chat = () => {
         name: 'name',
         type: 'string',
         required: true,
-        description: 'The name of the speaker or topic that the user wants to rate',
+        description:
+          'The name of the speaker or topic that the user wants to rate',
       },
     ],
     renderAndWait: ({ args, status, respond, result }) => {
       const resolvedTarget = args.target || 'speaker';
-      const resolvedName = args.name || (resolvedTarget === 'speaker' ? 'Speaker' : 'Topic');
+      const resolvedName =
+        args.name || (resolvedTarget === 'speaker' ? 'Speaker' : 'Topic');
 
       const reviewerDisplayName = user?.displayName || 'Anonymous';
       const reviewerUserId = user?.uid || 'anonymous';
