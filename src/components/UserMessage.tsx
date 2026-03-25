@@ -40,7 +40,7 @@ export const UserMessage = ({
       <div
         className="
         py-[10px] px-[15px] max-w-[75%]
-        text-md leading-relaxed break-words font-dm-sans
+        text-sm sm:text-[16px] leading-relaxed break-words font-dm-sans
         text-white/[.87]
         rounded-[18px_4px_18px_18px]
         bg-[linear-gradient(135deg,rgba(124,58,237,.5),rgba(79,70,229,.5))]
