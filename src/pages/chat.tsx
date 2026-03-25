@@ -70,7 +70,7 @@ const Chat = () => {
       const reviewerUserId = user?.uid || 'anonymous';
 
       // After submission, show the completed rating card
-      if (status === 'complete') {
+      if (status === ACTION_HANDLER_STATUS.COMPLETE) {
         let completedRating = 0;
         let wasCancelled = false;
         try {
@@ -87,24 +87,25 @@ const Chat = () => {
 
         if (wasCancelled) {
           return (
-            <div
-              style={{
-                background:
-                  'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-                borderRadius: '16px',
-                padding: '20px 24px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                maxWidth: '420px',
-                fontFamily: "'Inter', 'Segoe UI', sans-serif",
-                color: 'rgba(255, 255, 255, 0.6)',
-                fontSize: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>🚫</span>
-              <span>Rating cancelled — no worries!</span>
+            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-tl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl border border-[rgba(100,80,200,0.22)] dark:border-white/10 bg-white/80 dark:bg-white/[.08] backdrop-blur-md shadow-[0_2px_10px_rgba(251,146,60,0.08)] max-w-fit">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-400/15 shrink-0">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  className="text-orange-400 dark:text-orange-300"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </span>
+              <span className="text-md whitespace-nowrap">
+                Rating cancelled — no worries!
+              </span>
             </div>
           );
         }
