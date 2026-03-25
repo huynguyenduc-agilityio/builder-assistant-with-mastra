@@ -8,162 +8,111 @@ export const RatingCard = ({
   status,
 }: RatingCardProps) => {
   const isLoading = status !== 'complete';
+  const isSpeaker = target === 'speaker';
 
   return (
-    <div
-      style={{
-        background:
-          'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-        borderRadius: '16px',
-        padding: '24px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow:
-          '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        maxWidth: '380px',
-        fontFamily: "'Inter', 'Segoe UI', sans-serif",
-        position: 'relative' as const,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Decorative glow */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '200px',
-          height: '200px',
-          background:
-            'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '16px',
-        }}
-      >
-        <span
-          style={{
-            background:
-              target === 'speaker'
-                ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
-                : 'linear-gradient(135deg, #f59e0b, #ef4444)',
-            color: '#fff',
-            padding: '4px 12px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 600,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.05em',
-          }}
-        >
-          {target === 'speaker' ? '🎤 Speaker' : '📋 Topic'}
-        </span>
-        {isLoading && (
+    <div className="relative overflow-hidden w-full max-w-sm rounded-tl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl border border-[rgba(100,80,200,0.22)] dark:border-white/10 bg-white/80 dark:bg-white/[.08] backdrop-blur-md shadow-[0_2px_14px_rgba(100,80,200,0.1)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]">
+      <div className="p-5">
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-4">
           <span
-            style={{
-              fontSize: '12px',
-              color: 'rgba(255, 255, 255, 0.5)',
-              fontStyle: 'italic',
-            }}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-widest uppercase border ${
+              isSpeaker
+                ? 'bg-violet-500/10 dark:bg-violet-500/15 text-violet-600 dark:text-violet-300 border-violet-400/30 dark:border-violet-500/25'
+                : 'bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-400/30 dark:border-amber-500/25'
+            }`}
           >
-            Submitting...
+            {isSpeaker ? '🎤 ' : '📋 '}
+            {isSpeaker ? 'Speaker' : 'Topic'}
           </span>
-        )}
-      </div>
 
-      {/* Name */}
-      <h3
-        style={{
-          margin: '0 0 14px 0',
-          fontSize: '18px',
-          fontWeight: 700,
-          color: '#e2e8f0',
-          lineHeight: 1.3,
-        }}
-      >
-        {name || 'Loading...'}
-      </h3>
+          {/* Submitting indicator */}
+          {isLoading && (
+            <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/40 italic">
+              <svg
+                className="w-3 h-3 animate-spin text-violet-400"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
+              </svg>
+              Submitting…
+            </span>
+          )}
+        </div>
 
-      {/* Stars */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <span
-            key={star}
-            style={{
-              fontSize: '24px',
-              filter:
-                star <= rating ? 'none' : 'grayscale(1) opacity(0.3)',
-              transition: 'all 0.3s ease',
-              transform: star <= rating ? 'scale(1)' : 'scale(0.85)',
-            }}
-          >
-            ⭐
-          </span>
-        ))}
-        <span
-          style={{
-            marginLeft: '8px',
-            fontSize: '16px',
-            fontWeight: 600,
-            color: '#fbbf24',
-            alignSelf: 'center',
-          }}
-        >
-          {rating}/5
-        </span>
-      </div>
-
-      {/* Reviewer */}
-      {reviewerName && (
-        <p
-          style={{
-            margin: '0 0 10px 0',
-            fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.5)',
-          }}
-        >
-          Reviewed by <strong style={{ color: '#a5b4fc' }}>{reviewerName}</strong>
+        {/* Name */}
+        <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-4">
+          {name || 'Loading…'}
         </p>
-      )}
 
-      {/* Status footer */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          paddingTop: '12px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
-      >
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: isLoading ? '#fbbf24' : '#34d399',
-            boxShadow: isLoading
-              ? '0 0 8px rgba(251, 191, 36, 0.5)'
-              : '0 0 8px rgba(52, 211, 153, 0.5)',
-          }}
-        />
-        <span
-          style={{
-            fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.5)',
-            fontWeight: 500,
-          }}
-        >
-          {isLoading ? 'Processing rating...' : 'Rating submitted ✓'}
-        </span>
+        {/* Stars + score */}
+        <div className="flex items-center gap-1 mb-4">
+          {[1, 2, 3, 4, 5].map((star) => {
+            const isActive = star <= rating;
+            return (
+              <svg
+                key={star}
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill={isActive ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={isActive ? 0 : 1.5}
+                style={{
+                  transform: isActive ? 'scale(1.1)' : 'scale(0.9)',
+                  transition: 'all 0.2s',
+                }}
+                className={
+                  isActive
+                    ? 'text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]'
+                    : 'text-gray-300 dark:text-white/20'
+                }
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            );
+          })}
+          <span className="ml-2 text-sm font-semibold text-amber-500 dark:text-amber-400">
+            {rating}/5
+          </span>
+        </div>
+
+        {/* Reviewer */}
+        {reviewerName && (
+          <p className="text-xs text-gray-400 dark:text-white/40 mb-4">
+            Reviewed by{' '}
+            <span className="font-semibold text-violet-500 dark:text-violet-300">
+              {reviewerName}
+            </span>
+          </p>
+        )}
+
+        {/* Status footer */}
+        <div className="flex items-center gap-2 pt-3 border-t border-black/[0.06] dark:border-white/[0.06]">
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              isLoading
+                ? 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]'
+                : 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]'
+            }`}
+          />
+          <span className="text-xs text-gray-400 dark:text-white/40 font-medium">
+            {isLoading ? 'Processing rating…' : 'Rating submitted ✓'}
+          </span>
+        </div>
       </div>
     </div>
   );
