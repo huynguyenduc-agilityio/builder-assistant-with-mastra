@@ -12,7 +12,6 @@ import { useScrollToBottom } from '@/hooks';
 
 // Components
 import { ErrorBoundaryChatBot } from './ErrorBoundaryChatBot';
-import { BotAvatar } from './BotAvatar';
 import { ProcessingIndicator } from './ProcessingIndicator';
 import { InterruptedMessage } from './InterruptedMessage';
 
@@ -184,7 +183,13 @@ export const AssistantMessage = ({
       }
     >
       <div ref={ref} className="flex items-start gap-2.5 py-1">
-        <BotAvatar />
+        <div className="w-[30px] h-[30px] rounded-2xl flex items-center justify-center shrink-0">
+          <img
+            src="https://static.wixstatic.com/media/484b05_17aeb9761fe84d89bffaec05d4ca3160%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/484b05_17aeb9761fe84d89bffaec05d4ca3160%7Emv2.png"
+            alt="DevDay Logo"
+            className="w-full h-full object-contain"
+          />
+        </div>
 
         {isProcessing && !content && !showCard ? (
           // Waiting for first token — show spinner

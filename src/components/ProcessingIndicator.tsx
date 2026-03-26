@@ -44,7 +44,7 @@ export const ProcessingIndicator = ({
             className="w-full h-full"
           />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 mt-1">
           <span className="text-md font-semibold text-[rgba(80,60,160,0.8)] dark:text-white/60 tracking-wide">
             DevDay Assistant
           </span>
