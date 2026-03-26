@@ -3,4 +3,5 @@ export enum InfoHubResponseType {
   CONTACT_US = 'contact_us',
   VENUE = 'venue',
   AGENDA = 'agenda',
+  PARTNER = 'partner',
 }

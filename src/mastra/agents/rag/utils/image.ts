@@ -8,6 +8,7 @@ import {
   ALT_ATTR_PATTERN,
   WIX_MEDIA_ID_PATTERN,
   FILE_EXTENSION_PATTERN,
+  WIX_IMAGE_CONTAINER_PATTERN,
 } from '@/mastra/constants';
 
 const extractNameFromUrl = (url: string): string => {
@@ -22,11 +23,53 @@ const extractNameFromUrl = (url: string): string => {
 };
 
 /**
+ * Build a map of mediaId → cleaned title from Wix image container divs.
+ * Wix renders speaker avatars as: <div class="wixui-image" title="Speaker Name.jpg">
+ * while the inner <img> has alt="". This map provides the fallback name.
+ */
+const buildWixImageTitleMap = (html: string): Map<string, string> => {
+  const titleMap = new Map<string, string>();
+  const containerRegex = new RegExp(
+    WIX_IMAGE_CONTAINER_PATTERN.source,
+    WIX_IMAGE_CONTAINER_PATTERN.flags,
+  );
+  let match;
+
+  while ((match = containerRegex.exec(html)) !== null) {
+    const rawTitle = match[1];
+    const imgSrc = match[2];
+
+    if (!rawTitle || !imgSrc) continue;
+
+    const mediaIdMatch = imgSrc.match(WIX_MEDIA_ID_PATTERN);
+    const mediaId = mediaIdMatch ? mediaIdMatch[1] : null;
+    if (!mediaId) continue;
+
+    // Clean the title: remove file extension and common suffixes
+    const cleanedTitle = rawTitle
+      .replace(FILE_EXTENSION_PATTERN, '')
+      .replace(ALT_SUFFIX_PATTERN, '')
+      .replace(/_/g, ' ')
+      .trim();
+
+    if (cleanedTitle && !WIX_HASH_PATTERN.test(cleanedTitle)) {
+      titleMap.set(mediaId, cleanedTitle);
+    }
+  }
+
+  return titleMap;
+};
+
+/**
  * Extract all image URLs from raw HTML with alt text and filename info.
+ * Uses Wix container div `title` as fallback when <img> alt is empty.
  */
 export const extractImagesFromHtml = (html: string): ExtractedImage[] => {
   const images: ExtractedImage[] = [];
   const seenIndex = new Map<string, number>();
+
+  // Build fallback title map from wixui-image container divs
+  const titleFallbackMap = buildWixImageTitleMap(html);
 
   const imgRegex = new RegExp(IMG_TAG_PATTERN.source, IMG_TAG_PATTERN.flags);
   let match;
@@ -46,6 +89,14 @@ export const extractImagesFromHtml = (html: string): ExtractedImage[] => {
     let alt = altMatch ? altMatch[1].trim() : '';
     alt = alt.replace(FILE_EXTENSION_PATTERN, '');
     alt = alt.replace(ALT_SUFFIX_PATTERN, '').replace(/_/g, ' ').trim();
+
+    // Fallback: use title from parent wixui-image div if alt is empty
+    if (!alt) {
+      const titleFallback = titleFallbackMap.get(mediaId);
+      if (titleFallback) {
+        alt = titleFallback;
+      }
+    }
 
     const src = normalizeWixUrl(rawSrc);
     const filename = extractNameFromUrl(rawSrc);

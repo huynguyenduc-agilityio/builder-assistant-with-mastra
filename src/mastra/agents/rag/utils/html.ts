@@ -28,20 +28,15 @@ export const stripHtmlPreserveLines = (html: string): string => {
 };
 
 /**
- * Clean the raw text by removing irrelevant sections (partners, footer).
- * Keeps AGENDA and OUR SPEAKERS sections for searchability.
+ * Clean the raw text by removing irrelevant sections (footer duplicates).
+ * Keeps AGENDA, OUR SPEAKERS, and PARTNERS sections for searchability.
+ *
+ * Note: Partner names (logos) are extracted separately via
+ * `extractStructuredPartnerChunks` from the raw HTML, since they exist
+ * as image alt attributes rather than visible text.
  */
 export const cleanTextContent = (text: string): string => {
   let cleaned = text;
-
-  // Remove PARTNERS section (sponsor names are not useful for queries)
-  const partnersIdx = cleaned.indexOf('PARTNERS');
-  if (partnersIdx > -1) {
-    const nextSectionIdx = cleaned.indexOf('OUR SPEAKERS', partnersIdx);
-    const contactIdx = cleaned.indexOf('Contact us', partnersIdx);
-    const endIdx = nextSectionIdx > -1 ? nextSectionIdx : (contactIdx > -1 ? contactIdx : partnersIdx + 500);
-    cleaned = cleaned.substring(0, partnersIdx) + cleaned.substring(endIdx);
-  }
 
   // Remove footer/contact duplicates
   const footerIdx = cleaned.lastIndexOf('Follow us');

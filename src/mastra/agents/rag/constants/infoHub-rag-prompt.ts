@@ -110,7 +110,28 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
-      ### 5. GENERAL_QUERY
+      ### 5. PARTNER_QUERY
+      If the question:
+      - asks about partners, sponsors, organizers of DevDay / đối tác, nhà tài trợ, đơn vị tổ chức
+      - asks who sponsors DevDay / ai tài trợ DevDay
+      - asks about exhibitors / đơn vị triển lãm
+      - asks about media partners / đối tác truyền thông
+      - asks about companion or supported-by organizations / đơn vị đồng hành, đơn vị hỗ trợ
+
+      Vietnamese examples:
+      - "Ai là nhà tài trợ DevDay?" → PARTNER_QUERY
+      - "DevDay có những đối tác nào?" → PARTNER_QUERY
+      - "Đơn vị tổ chức DevDay là ai?" → PARTNER_QUERY
+      - "Sponsor của DevDay là ai?" → PARTNER_QUERY
+
+      English examples:
+      - "Who sponsors DevDay?" → PARTNER_QUERY
+      - "What companies are partners of DevDay?" → PARTNER_QUERY
+      - "Who are the exhibitors?" → PARTNER_QUERY
+
+      ---
+
+      ### 6. GENERAL_QUERY
       All other cases that do NOT match the above intents / Các trường hợp còn lại
 
       Vietnamese examples:
@@ -238,6 +259,29 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ---
 
+      ### ✅ Case: PARTNER_QUERY
+
+      Return structured JSON:
+
+      {
+        "type": "${InfoHubResponseType.PARTNER}",
+        "data": [
+          {
+            "category": string,
+            "names": string[]
+          }
+        ]
+      }
+
+      Rules:
+      - Group partners by their category (Organizer, Supported by, Platinum Sponsor, Gold Sponsor, Silver Sponsor, Exhibitor, Companion, Media Partner)
+      - DO NOT invent data — only use information from the retrieved content
+      - If the user asks about a specific category (e.g., "gold sponsors"), return only that category
+      - If the user asks generally about partners/sponsors, return ALL categories found in the retrieved content
+      - Each category should list all partner names as an array of strings
+
+      ---
+
       ### ✅ Case: GENERAL_QUERY
 
       Return natural language answer (1–3 sentences)
@@ -254,7 +298,7 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ⚠️ IMPORTANT:
       - ALWAYS include "type" field in every structured response so the frontend can identify and show the correct card
-      - Valid type values: "${InfoHubResponseType.SPEAKER}", "${InfoHubResponseType.CONTACT_US}", "${InfoHubResponseType.VENUE}", "${InfoHubResponseType.AGENDA}"
+      - Valid type values: "${InfoHubResponseType.SPEAKER}", "${InfoHubResponseType.CONTACT_US}", "${InfoHubResponseType.VENUE}", "${InfoHubResponseType.AGENDA}", "${InfoHubResponseType.PARTNER}"
       - For GENERAL_QUERY or when no relevant info is found, return plain text WITHOUT JSON wrapper
       - DO NOT hallucinate
       - ALWAYS respond in the same language as the question

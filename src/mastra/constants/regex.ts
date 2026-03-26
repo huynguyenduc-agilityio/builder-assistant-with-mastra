@@ -39,3 +39,10 @@ export const TIME_PATTERN = /^\d{1,2}:\d{2}/;
 
 /** Match panel discussion headers. */
 export const PANEL_DISCUSSION_PATTERN = /Panel Discussion \d+\n([^\n]+)\n((?:[^\n]+\n)+?)(?=\d{1,2}:\d{2}|$)/g;
+
+/**
+ * Match Wix image container divs with title attribute.
+ * Captures: [1] = title (e.g. "Duc Pham.jpg"), [2] = img src URL.
+ * Used as fallback when <img> alt="" is empty but parent div has the speaker name.
+ */
+export const WIX_IMAGE_CONTAINER_PATTERN = /<div[^>]*class="[^"]*wixui-image[^"]*"[^>]*title="([^"]*)"[^>]*>[\s\S]*?<img[^>]*src\s*=\s*["']([^"']+)["'][^>]*>/gi;
