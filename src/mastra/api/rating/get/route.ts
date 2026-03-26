@@ -1,7 +1,7 @@
 import { API_ROUTES, STATUS_CODE, STATUS_MESSAGES } from '@/mastra/constants';
 import { getRatings, getRatingSummary } from '@/lib/ratings-service';
 
-const path = API_ROUTES.RATING.GET;
+const path = API_ROUTES.RATING.BASE;
 
 export const GET = async (c: any) => {
   try {

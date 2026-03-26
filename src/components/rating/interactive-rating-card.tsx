@@ -44,7 +44,7 @@ export const InteractiveRatingCard = ({
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
 
-      const res = await fetch(`${MASTRA_BASE_URL}/rating/submit`, {
+      const res = await fetch(`${MASTRA_BASE_URL}/rating`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

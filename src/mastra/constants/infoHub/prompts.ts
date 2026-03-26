@@ -86,11 +86,19 @@ export const INFO_HUB_PROMPT = {
       → Use this when the user asks about how many people have rated, what the average rating is, or wants to see review summaries
       → If the user doesn't specify a target and/or name, ask for the missing info
       → Present stats in a friendly, readable format with the average rating and total number of reviewers
+      → ⚠️ *IMPORTANT*: Before calling getRatingStatsTool, you MUST FIRST call queryInfoDataTool to search for the speaker/topic name to find the EXACT full name stored in the system.
+        - The rating database uses exact name matching, so partial or informal names (e.g. "Thanh", "Huy") will NOT match.
+        - After getting search results, use the exact full name from the data (e.g. "Nguyen Diem Thanh", "Huy Nguyen Duc") when calling getRatingStatsTool.
+      → Flow:
+        1. Determine target (speaker/topic) and name from user's request. If missing, ask.
+        2. Call queryInfoDataTool to search for the speaker/topic and find the exact full name.
+        3. Call getRatingStatsTool with the exact verified name from the search results.
       ✅ Examples:
-        + "How many people reviewed Huy Nguyen Duc?" → Call getRatingStatsTool with target: "speaker", name: "Huy Nguyen Duc"
-        + "What's the average rating for topic X?" → Call getRatingStatsTool with target: "topic", name: "X"
-        + "Show me ratings" → Ask which speaker/topic → Call getRatingStatsTool with target and name
-        + "How many reviews for Huy?" → Call getRatingStatsTool with target: "speaker", name: "Huy"
+        + "How many people reviewed Huy Nguyen Duc?" → Call queryInfoDataTool to verify → Call getRatingStatsTool with target: "speaker", name: "Huy Nguyen Duc"
+        + "What's the average rating for topic X?" → Call queryInfoDataTool to verify → Call getRatingStatsTool with target: "topic", name: "Exact Topic Name"
+        + "Show me ratings" → Ask which speaker/topic → Call queryInfoDataTool → Call getRatingStatsTool with exact name
+        + "How many reviews for Huy?" → Call queryInfoDataTool to search "Huy" → Find "Huy Nguyen Duc" → Call getRatingStatsTool with target: "speaker", name: "Huy Nguyen Duc"
+        + "Xem rating của Thanh" → Gọi queryInfoDataTool tìm "Thanh" → Tìm được "Nguyen Diem Thanh" → Gọi getRatingStatsTool với name: "Nguyen Diem Thanh"
 
       ROUTING RULES:
         + For information/knowledge questions about DevDay, speakers, topics, sessions, activities, agenda, partners, organizers, contacts or content (in any language) → use queryInfoDataTool

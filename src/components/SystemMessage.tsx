@@ -134,7 +134,7 @@ export const AssistantMessage = ({
         {isProcessing && !content ? (
           <ProcessingIndicator />
         ) : (
-          content && (
+          (content || subComponent) && (
             <div
               className={combineClasses(
                 'px-4 py-2.5 text-sm leading-relaxed max-w-[72%] backdrop-blur-md',
@@ -145,9 +145,11 @@ export const AssistantMessage = ({
                 'shadow-[0_2px_14px_rgba(100,80,200,0.1)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]',
               )}
             >
-              <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:font-semibold">
-                <Markdown content={content} />
-              </div>
+              {content && (
+                <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:font-semibold">
+                  <Markdown content={content} />
+                </div>
+              )}
               {subComponent}
             </div>
           )

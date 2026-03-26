@@ -1,10 +1,9 @@
 export const API_ROUTES = {
   INFO_HUB: {
-    EMBEDDED: '/infoHub/embed',
-    DELETE: '/infoHub/delete',
+    BASE: '/infoHub',
+    EMBED: '/infoHub/embed',
   },
   RATING: {
-    SUBMIT: '/rating/submit',
-    GET: '/rating/get',
+    BASE: '/rating',
   },
 };
