@@ -3,7 +3,7 @@ import { submitRating, getRatingSummary } from '@/lib/ratings-service';
 
 export type { RatingEntry } from '@/lib/ratings-service';
 
-const path = API_ROUTES.RATING.SUBMIT;
+const path = API_ROUTES.RATING.BASE;
 
 export const POST = async (c: any) => {
   try {

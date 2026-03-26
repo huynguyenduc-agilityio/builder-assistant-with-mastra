@@ -5,10 +5,10 @@ import { registerApiRoute } from '@mastra/core/server';
 
 import { createStorage } from './storages';
 import { API_ROUTES } from './constants';
-import { POST as infoHubEmbedPost } from '@/api/infoHub/embed/route';
-import { POST as infoHubDeletePost } from '@/api/infoHub/delete/route';
-import { POST as ratingSubmitPost } from '@/api/rating/submit/route';
-import { GET as ratingGetHandler } from '@/api/rating/get/route';
+import { POST as infoHubEmbedPost } from '@/mastra/api/infoHub/embed/route';
+import { POST as infoHubDeletePost } from '@/mastra/api/infoHub/delete/route';
+import { POST as ratingSubmitPost } from '@/mastra/api/rating/submit/route';
+import { GET as ratingGetHandler } from '@/mastra/api/rating/get/route';
 import { infoHubAgent } from './agents/infoHub/info-hub-agent';
 
 const LOG_LEVEL = (process.env.LOG_LEVEL as LogLevel) || 'debug';
@@ -30,25 +30,25 @@ export const mastra = new Mastra({
       allowHeaders: ['*'],
     },
     apiRoutes: [
-      registerApiRoute(API_ROUTES.INFO_HUB.EMBEDDED, {
+      registerApiRoute(API_ROUTES.INFO_HUB.EMBED, {
         method: 'POST',
         handler: async (c: any) => {
           return infoHubEmbedPost(c);
         },
       }),
-      registerApiRoute(API_ROUTES.INFO_HUB.DELETE, {
-        method: 'POST',
+      registerApiRoute(API_ROUTES.INFO_HUB.BASE, {
+        method: 'DELETE',
         handler: async () => {
           return infoHubDeletePost();
         },
       }),
-      registerApiRoute(API_ROUTES.RATING.SUBMIT, {
+      registerApiRoute(API_ROUTES.RATING.BASE, {
         method: 'POST',
         handler: async (c: any) => {
           return ratingSubmitPost(c);
         },
       }),
-      registerApiRoute(API_ROUTES.RATING.GET, {
+      registerApiRoute(API_ROUTES.RATING.BASE, {
         method: 'GET',
         handler: async (c: any) => {
           return ratingGetHandler(c);
@@ -61,4 +61,3 @@ export const mastra = new Mastra({
     ],
   },
 });
-
