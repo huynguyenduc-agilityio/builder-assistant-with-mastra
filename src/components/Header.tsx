@@ -53,10 +53,14 @@ export const Header = () => {
 
   const themeLabel = isDark ? 'Light mode' : 'Dark mode';
 
+  const rawName = user?.displayName || '';
+  const displayName =
+    rawName.replace(/\s*\(.*\)\s*$/, '').trim() || rawName || 'User';
+
   const avatar = user?.photoURL ? (
     <img
       src={user.photoURL}
-      alt={user.displayName || 'User'}
+      alt={displayName || 'User'}
       className="w-full h-full rounded-full object-cover ring-2 ring-indigo-500/30"
       referrerPolicy="no-referrer"
     />
@@ -236,7 +240,7 @@ export const Header = () => {
                       <div className="w-10 h-10 shrink-0">{avatar}</div>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold truncate text-[#1e1040] dark:text-white font-syne">
-                          {user.displayName || 'User'}
+                          {displayName || 'User'}
                         </p>
                         <p className="text-[11px] truncate text-[rgba(80,60,160,0.55)] dark:text-white/40 font-syne">
                           {user.email}
