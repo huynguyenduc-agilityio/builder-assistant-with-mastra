@@ -143,8 +143,11 @@ export async function getRatingSummary(type: 'speaker' | 'topic') {
 /**
  * Build full stats for a target type (for the stats tool).
  */
-export async function buildRatingStats(type: 'speaker' | 'topic', name: string) {
-  const ratings = await getRatings({ type });
+export async function buildRatingStats(
+  type: 'speaker' | 'topic',
+  name: string,
+) {
+  const ratings = await getRatings({ type, name });
   const totalReviewers = ratings.length;
   const averageRating =
     totalReviewers > 0
@@ -160,13 +163,11 @@ export async function buildRatingStats(type: 'speaker' | 'topic', name: string) 
   });
 
   // Recent reviews (last 5)
-  const recentReviews = ratings
-    .slice(0, 5)
-    .map((r) => ({
-      userName: r.userName,
-      rating: r.rating,
-      date: r.updatedAt || r.createdAt,
-    }));
+  const recentReviews = ratings.slice(0, 5).map((r) => ({
+    userName: r.userName,
+    rating: r.rating,
+    date: r.updatedAt || r.createdAt,
+  }));
 
   return {
     type,

@@ -7,7 +7,7 @@ import {
   infoHubStoreIndexName,
 } from '@/mastra/storages/cloudflare';
 
-const path = API_ROUTES.INFO_HUB.EMBEDDED;
+const path = API_ROUTES.INFO_HUB.EMBED;
 
 export const POST = async (c: any) => {
   try {
