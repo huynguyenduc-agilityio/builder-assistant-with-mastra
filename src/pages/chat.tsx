@@ -18,6 +18,10 @@ import {
   Header,
   Blobs,
 } from '@/components';
+import { SpeakerResultCard } from '@/components/SpeakerResultRenderer';
+import { VenueResultCard } from '@/components/VenueCard';
+import { ContactResultCard } from '@/components/ContactCard';
+import { AgendaResultCard } from '@/components/AgendaCard';
 
 // Constants
 import { COPILOT_LABEL, MASTRA_BASE_URL } from '@/constants';
@@ -31,10 +35,33 @@ const Chat = () => {
   useCopilotAction({
     name: 'queryInfoDataTool',
     available: 'disabled',
-    parameters: [{ name: 'query', type: 'string', required: false }],
-    render: ({ status }) => {
-      if (status !== ACTION_HANDLER_STATUS.COMPLETE) {
+    followUp: false,
+    render: ({ args, status, result }) => {
+      console.log('{ args, status, result }: ', { args, status, result });
+      if (status !== ACTION_HANDLER_STATUS.COMPLETE)
         return <ProcessingIndicator />;
+
+      let parsed = null;
+      try {
+        parsed = typeof result === 'string' ? JSON.parse(result) : result;
+      } catch {
+        return <></>;
+      }
+
+      if (parsed?.type === 'speaker') {
+        return <SpeakerResultCard data={parsed.data} />;
+      }
+
+      if (parsed?.type === 'venue' && parsed.data) {
+        return <VenueResultCard result={result} />;
+      }
+
+      if (parsed?.type === 'contact_us') {
+        return <ContactResultCard result={result} />;
+      }
+
+      if (parsed?.type === 'agenda') {
+        return <AgendaResultCard result={result} />;
       }
 
       return <></>;
