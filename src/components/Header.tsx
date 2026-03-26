@@ -8,7 +8,7 @@ import { useAuth } from '@/components/auth-context';
 
 // Components
 import { OnlineDot } from './OnlineDot';
-import { LogoMark } from './LogoMark';
+// import { LogoMark } from './LogoMark';
 import { UserMenu } from './user-menu';
 import { UserAvatar } from './UserAvatar';
 
@@ -69,14 +69,18 @@ export const Header = () => {
       <header className="shrink-0 h-[58px] px-4 sm:px-6 flex items-center justify-between z-10 border-b backdrop-blur-[28px] bg-white/55 border-[rgba(100,80,200,0.12)] shadow-[0_1px_0_rgba(255,255,255,0.04),0_8px_32px_rgba(0,0,0,0.15)] dark:bg-white/[.04] dark:border-white/[.08]">
         {/* Branding */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="shrink-0 w-[34px] h-[34px] rounded-full flex items-center justify-center bg-[linear-gradient(135deg,rgba(124,58,237,.7),rgba(6,182,212,.7))] border border-white/20 shadow-[0_2px_12px_rgba(0,0,0,.25)]">
-            <LogoMark />
+          <div className="w-[38px] h-[38px] rounded-2xl flex items-center justify-center shrink-0">
+            <img
+              src="https://static.wixstatic.com/media/484b05_17aeb9761fe84d89bffaec05d4ca3160%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/484b05_17aeb9761fe84d89bffaec05d4ca3160%7Emv2.png"
+              alt="DevDay Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-sm sm:text-[17px] leading-tight tracking-tight font-syne text-[#1e1040] dark:text-white truncate">
+            <p className="font-bold text-sm sm:text-[15px] leading-tight tracking-tight font-syne text-[#1e1040] dark:text-white truncate">
               DevDay Assistant
             </p>
-            <div className="flex items-center gap-1.5 mt-0.5">
+            <div className="flex items-center gap-1.5">
               <OnlineDot />
               <span className="text-[11px] text-[rgba(80,60,160,0.5)] dark:text-white/35">
                 Online • AI-powered

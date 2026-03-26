@@ -17,26 +17,26 @@ if (typeof document !== 'undefined') {
   document.body.classList.add('welcome-active');
 }
 
-const LogoMark = () => (
-  <svg viewBox="0 0 36 36" fill="none" className="w-10 h-10">
-    <ellipse
-      cx="18"
-      cy="18"
-      rx="14"
-      ry="8"
-      stroke="white"
-      strokeWidth="1.8"
-      fill="none"
-    />
-    <ellipse cx="18" cy="18" rx="3.5" ry="3.5" fill="white" />
-    <path
-      d="M4 18 Q11 8 18 18 Q25 28 32 18"
-      stroke="rgba(255,255,255,0.55)"
-      strokeWidth="1.4"
-      fill="none"
-    />
-  </svg>
-);
+// const LogoMark = () => (
+//   <svg viewBox="0 0 36 36" fill="none" className="w-10 h-10">
+//     <ellipse
+//       cx="18"
+//       cy="18"
+//       rx="14"
+//       ry="8"
+//       stroke="white"
+//       strokeWidth="1.8"
+//       fill="none"
+//     />
+//     <ellipse cx="18" cy="18" rx="3.5" ry="3.5" fill="white" />
+//     <path
+//       d="M4 18 Q11 8 18 18 Q25 28 32 18"
+//       stroke="rgba(255,255,255,0.55)"
+//       strokeWidth="1.4"
+//       fill="none"
+//     />
+//   </svg>
+// );
 
 export const WelcomeScreen = ({
   title = COPILOT_LABEL.WELCOME_TITLE,
@@ -100,7 +100,7 @@ export const WelcomeScreen = ({
             className="pointer-events-auto w-full max-w-[480px] rounded-[24px] p-8 flex flex-col items-center gap-6 backdrop-blur-[32px] border bg-white/60 border-[rgba(100,80,200,0.15)] shadow-[0_24px_64px_rgba(100,80,200,0.12),inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-white/[.05] dark:border-white/10 dark:shadow-[0_24px_64px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.1)]"
           >
             {/* Logo */}
-            <motion.div
+            {/* <motion.div
               initial={{ scale: 0.7, opacity: 0, rotate: -12 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               transition={{
@@ -111,7 +111,14 @@ export const WelcomeScreen = ({
               className="w-16 h-16 rounded-full flex items-center justify-center bg-[linear-gradient(135deg,rgba(124,58,237,.75),rgba(6,182,212,.75))] border border-white/20 shadow-[0_4px_20px_rgba(99,60,220,0.35)]"
             >
               <LogoMark />
-            </motion.div>
+            </motion.div> */}
+            <div className="w-40 h-16 rounded-2xl from-indigo-500 to-purple-600 flex items-center justify-center px-3">
+              <img
+                src="https://static.wixstatic.com/media/484b05_5308a7a859e54d94bf683cedf2a25f34~mv2.png/v1/fill/w_276,h_66,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Asset%2010.png"
+                alt="DevDay Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
 
             {/* Title + subtitle */}
             <motion.div
