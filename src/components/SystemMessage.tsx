@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Markdown, type AssistantMessageProps } from '@copilotkit/react-ui';
 import { useCopilotChat } from '@copilotkit/react-core';
 import {
@@ -21,6 +21,61 @@ import { combineClasses } from '@/utils';
 
 // Constants
 import { CHATBOT_MESSAGES, LONG_RESPONSE_TIME } from '@/constants';
+
+interface BridgeProps {
+  RenderComponent?: (args: unknown) => React.ReactNode;
+  isExecuting?: boolean;
+  toolCall?: unknown;
+  toolMessage?: unknown;
+}
+
+const getComponentName = (node: React.ReactNode): string => {
+  if (!React.isValidElement(node)) return '';
+  const type = node.type as { displayName?: string; name?: string };
+  return type?.displayName ?? type?.name ?? '';
+};
+
+// Returns true when subComponent will render a real custom card.
+// CoAgentStateRenderBridge wraps all useCopilotAction render() outputs —
+// we call RenderComponent() to check if it produces actual content.
+const hasRealCard = (subComponent: React.ReactNode): boolean => {
+  if (!subComponent) return false;
+  if (!React.isValidElement(subComponent)) return false;
+
+  const name = getComponentName(subComponent);
+  const props = (subComponent as React.ReactElement).props as BridgeProps;
+
+  // CoAgentStateRenderBridge — check if RenderComponent produces real content
+  if (name === 'CoAgentStateRenderBridge') {
+    if (!props.RenderComponent) return false;
+
+    // Call the render function to see what it produces
+    try {
+      const rendered = props.RenderComponent({});
+      if (!rendered) return false;
+      if (!React.isValidElement(rendered)) return false;
+
+      // Empty fragment so no card
+      if ((rendered as React.ReactElement).type === React.Fragment) {
+        const children = (
+          (rendered as React.ReactElement).props as { children?: unknown }
+        ).children;
+        return Boolean(children);
+      }
+
+      // ProcessingIndicator → still loading, not a card
+      const renderedName = getComponentName(rendered);
+      if (renderedName === 'ProcessingIndicator') return false;
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Direct component (not wrapped) — treat as real card
+  return true;
+};
 
 const handleUnResponsiveMessage = (
   appendMessage: (message: Message) => void,
@@ -83,7 +138,9 @@ export const AssistantMessage = ({
     ? cleanedMessage || CHATBOT_MESSAGES.HANG_ON
     : cleanedMessage;
 
-  // Slow response timeout
+  const showCard = hasRealCard(subComponent);
+
+  // Auto-stop if agent takes too long
   useEffect(() => {
     if (!isLoading) return;
 
@@ -112,9 +169,6 @@ export const AssistantMessage = ({
     container?.scrollTo({ top: container.scrollHeight, behavior: 'instant' });
   }, [cleanedMessage, isProcessing]);
 
-  // TODO: Check behavior pending later
-  // if (!content && !isProcessing) return null;
-
   return (
     <ErrorBoundaryChatBot
       onRespondError={() =>
@@ -131,8 +185,12 @@ export const AssistantMessage = ({
     >
       <div ref={ref} className="flex items-start gap-2.5 py-1">
         <BotAvatar />
-        {isProcessing && !content ? (
+
+        {isProcessing && !content && !showCard ? (
+          // Waiting for first token — show spinner
           <ProcessingIndicator />
+        ) : showCard ? (
+          subComponent
         ) : (
           content && (
             <div
@@ -148,7 +206,6 @@ export const AssistantMessage = ({
               <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:font-semibold">
                 <Markdown content={content} />
               </div>
-              {subComponent}
             </div>
           )
         )}
