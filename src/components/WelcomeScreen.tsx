@@ -112,7 +112,7 @@ export const WelcomeScreen = ({
             >
               <LogoMark />
             </motion.div> */}
-            <div className="w-40 h-16 rounded-2xl from-indigo-500 to-purple-600 flex items-center justify-center px-3">
+            <div className="w-40 h-14 rounded-xl flex items-center justify-center px-4 bg-[#1a1035]/40 dark:bg-transparent">
               <img
                 src="https://static.wixstatic.com/media/484b05_5308a7a859e54d94bf683cedf2a25f34~mv2.png/v1/fill/w_276,h_66,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Asset%2010.png"
                 alt="DevDay Logo"
