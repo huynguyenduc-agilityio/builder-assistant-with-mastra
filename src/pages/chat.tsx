@@ -22,6 +22,7 @@ import { SpeakerResultCard } from '@/components/SpeakerResultRenderer';
 import { VenueResultCard } from '@/components/VenueCard';
 import { ContactResultCard } from '@/components/ContactCard';
 import { AgendaResultCard } from '@/components/AgendaCard';
+import { PartnerResultCard } from '@/components/PartnerCard';
 
 // Constants
 import { COPILOT_LABEL, MASTRA_BASE_URL } from '@/constants';
@@ -62,6 +63,10 @@ const Chat = () => {
 
       if (parsed?.type === 'agenda') {
         return <AgendaResultCard result={result} />;
+      }
+
+      if (parsed?.type === 'partner') {
+        return <PartnerResultCard result={result} />;
       }
 
       return <></>;

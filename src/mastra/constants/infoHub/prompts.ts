@@ -102,6 +102,10 @@ export const INFO_HUB_PROMPT = {
 
       ROUTING RULES:
         + For information/knowledge questions about DevDay, speakers, topics, sessions, activities, agenda, partners, organizers, contacts or content (in any language) → use queryInfoDataTool
+        + For registration/sign-up/ticket questions (how to register, how to sign up, how to attend, buy tickets, đăng ký, tham gia) → call queryInfoDataTool with query "contact us DevDay" to retrieve contact information, then respond:
+          English: "For registration details, please reach out to the DevDay organizers directly — here's how you can contact them:"
+          Vietnamese: "Để biết thông tin đăng ký, vui lòng liên hệ trực tiếp với ban tổ chức DevDay — đây là thông tin liên hệ:"
+          → The tool will return contact info which displays as a ContactCard
         + For rating/review requests → use rateTool
         + For rating statistics/summary requests → use getRatingStatsTool
 

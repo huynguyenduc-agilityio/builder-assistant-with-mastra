@@ -12,6 +12,7 @@ import {
 } from './html';
 import { extractImagesFromHtml, associateImagesWithChunks } from './image';
 import { extractStructuredSpeakerChunks } from './speaker';
+import { extractStructuredPartnerChunks } from './partner';
 
 export const createKnowledgeStoreFromHtml = async ({
   url,
@@ -52,7 +53,7 @@ export const createKnowledgeStoreFromHtml = async ({
     throw new Error('No text content extracted from HTML');
   }
 
-  // Clean text: remove irrelevant sections (partners, footer)
+  // Clean text: remove irrelevant sections (footer duplicates)
   const text = cleanTextContent(rawText);
 
   // Use line-preserving strip for structured speaker extraction
@@ -61,11 +62,18 @@ export const createKnowledgeStoreFromHtml = async ({
   // Extract structured speaker chunks from the AGENDA section
   const speakerChunks = extractStructuredSpeakerChunks(textWithLines);
 
+  // Extract structured partner/sponsor chunks from raw HTML (img alt attrs)
+  const partnerChunks = extractStructuredPartnerChunks(rawHtml);
+
   if (log) {
     console.log(
       `0.5. Extracted ${speakerChunks.length} structured speaker entries`,
     );
     speakerChunks.slice(0, 3).forEach((s, i) => console.log(`   [${i}] ${s}`));
+    console.log(
+      `0.6. Extracted ${partnerChunks.length} structured partner chunks`,
+    );
+    partnerChunks.forEach((p, i) => console.log(`   [${i}] ${p.substring(0, 120)}...`));
     console.log('1. Started creating knowledge store from HTML...');
   }
 
@@ -81,13 +89,14 @@ export const createKnowledgeStoreFromHtml = async ({
   // Chunk the cleaned general text
   const generalChunks = await chunkDocFromText(text, log);
 
-  // Prepend structured speaker chunks (each one is its own chunk)
+  // Prepend structured speaker + partner chunks (each one is its own chunk)
   const speakerChunkObjects = speakerChunks.map((text) => ({ text }));
-  const allChunks = [...speakerChunkObjects, ...generalChunks];
+  const partnerChunkObjects = partnerChunks.map((text) => ({ text }));
+  const allChunks = [...speakerChunkObjects, ...partnerChunkObjects, ...generalChunks];
 
   if (log) {
     console.log(
-      `3. Total chunks: ${speakerChunkObjects.length} speaker + ${generalChunks.length} general = ${allChunks.length}`,
+      `3. Total chunks: ${speakerChunkObjects.length} speaker + ${partnerChunkObjects.length} partner + ${generalChunks.length} general = ${allChunks.length}`,
     );
   }
 

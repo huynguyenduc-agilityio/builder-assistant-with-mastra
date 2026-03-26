@@ -14,6 +14,11 @@ export type SpeakerEntry = {
   language: string;
 };
 
+export type PartnerEntry = {
+  name: string;
+  category: string;
+};
+
 export type CreateKnowledgeStoreFromHtmlParams = {
   url?: string;
   html?: string;
