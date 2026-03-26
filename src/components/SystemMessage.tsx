@@ -192,7 +192,7 @@ export const AssistantMessage = ({
         ) : showCard ? (
           subComponent
         ) : (
-          (content || subComponent) && (
+          content && (
             <div
               className={combineClasses(
                 'px-4 py-2.5 text-sm leading-relaxed max-w-[72%] backdrop-blur-md',
