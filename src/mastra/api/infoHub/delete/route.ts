@@ -2,7 +2,7 @@ import { InfoHubKnowledgeStore } from '@/mastra/agents/infoHub/info-hub-knowledg
 import { API_ROUTES, STATUS_CODE, STATUS_MESSAGES } from '@/mastra/constants';
 import { cloudflareVector, infoHubStoreIndexName } from '@/mastra/storages';
 
-const path = API_ROUTES.INFO_HUB.DELETE;
+const path = API_ROUTES.INFO_HUB.BASE;
 
 export const POST = async () => {
   try {
