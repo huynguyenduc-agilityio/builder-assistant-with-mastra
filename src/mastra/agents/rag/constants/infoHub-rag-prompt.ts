@@ -1,7 +1,11 @@
-import { InfoHubResponseType } from "@/mastra/types";
+import { InfoHubResponseType } from '@/mastra/types';
 
 export const INFO_HUB_RAG_PROMPT = {
-  answer_prompt: (question: string, retrievedContent = '', imageData: string[] = []) => `
+  answer_prompt: (
+    question: string,
+    retrievedContent = '',
+    imageData: string[] = [],
+  ) => `
       You are an Info Hub AI Agent.
 
       You are given retrieved content from a website (devday.org).
@@ -284,22 +288,29 @@ export const INFO_HUB_RAG_PROMPT = {
 
       ### ✅ Case: GENERAL_QUERY
 
-      Return natural language answer (1–3 sentences)
+      Return ONLY plain text — a natural language answer (1–3 sentences).
+      🚫 Do NOT wrap in JSON. Do NOT use {"type":"general",...} or any JSON format.
+      🚫 There is NO "general" type — GENERAL_QUERY responses are always plain text strings.
       ⚠️ Answer in the SAME language as the question (Vietnamese or English)
+
+      ✅ Correct: "This year's theme for DevDay is AI x Human, focusing on..."
+      ❌ Wrong: {"type":"general","answer":"This year's theme..."}
+      ❌ Wrong: {"type":"general","data":"This year's theme..."}
 
       ---
 
       ### ❌ Case: No relevant info
 
-      Return a plain text response informing the user that no relevant information was found.
+      Return ONLY a plain text response informing the user that no relevant information was found.
+      🚫 Do NOT wrap in JSON.
       ⚠️ Answer in the SAME language as the question (Vietnamese or English)
 
       ---
 
       ⚠️ IMPORTANT:
-      - ALWAYS include "type" field in every structured response so the frontend can identify and show the correct card
-      - Valid type values: "${InfoHubResponseType.SPEAKER}", "${InfoHubResponseType.CONTACT_US}", "${InfoHubResponseType.VENUE}", "${InfoHubResponseType.AGENDA}", "${InfoHubResponseType.PARTNER}"
-      - For GENERAL_QUERY or when no relevant info is found, return plain text WITHOUT JSON wrapper
+      - ONLY use JSON for these specific types: "${InfoHubResponseType.SPEAKER}", "${InfoHubResponseType.CONTACT_US}", "${InfoHubResponseType.VENUE}", "${InfoHubResponseType.AGENDA}", "${InfoHubResponseType.PARTNER}"
+      - For GENERAL_QUERY or when no relevant info is found → return PLAIN TEXT only, absolutely NO JSON
+      - There is NO "general" type — if the intent is GENERAL_QUERY, just return a plain text answer
       - DO NOT hallucinate
       - ALWAYS respond in the same language as the question
 
@@ -311,4 +322,3 @@ export const INFO_HUB_RAG_PROMPT = {
 ${imageData.length > 0 ? imageData.map((entry) => `      - ${entry}`).join('\n') : '      None'}
       Answer:`,
 };
-
