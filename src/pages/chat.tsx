@@ -1,4 +1,4 @@
-import { CopilotChat } from '@copilotkit/react-ui';
+import { CopilotChat, Markdown } from '@copilotkit/react-ui';
 import { CopilotKit, useCopilotAction } from '@copilotkit/react-core';
 import '@copilotkit/react-ui/styles.css';
 import { useAuth } from '@/components/auth-context';
@@ -18,7 +18,7 @@ import {
   Header,
   Blobs,
 } from '@/components';
-import { SpeakerResultCard } from '@/components/SpeakerResultRenderer';
+import { SpeakerResultRenderer } from '@/components/SpeakerResultRenderer';
 import { VenueResultCard } from '@/components/VenueCard';
 import { ContactResultCard } from '@/components/ContactCard';
 import { AgendaResultCard } from '@/components/AgendaCard';
@@ -29,6 +29,25 @@ import { COPILOT_LABEL, MASTRA_BASE_URL } from '@/constants';
 
 // Types
 import { ACTION_HANDLER_STATUS } from '@/types';
+import { parseResult } from '@/utils';
+
+type QueryResultType =
+  | 'speaker'
+  | 'venue'
+  | 'contact_us'
+  | 'agenda'
+  | 'partner';
+
+const RESULT_CARD_MAP: Record<
+  QueryResultType,
+  (result: unknown) => React.ReactNode
+> = {
+  speaker: (result) => <SpeakerResultRenderer result={result} />,
+  venue: (result) => <VenueResultCard result={result} />,
+  contact_us: (result) => <ContactResultCard result={result} />,
+  agenda: (result) => <AgendaResultCard result={result} />,
+  partner: (result) => <PartnerResultCard result={result} />,
+};
 
 const Chat = () => {
   const { user } = useAuth();
@@ -42,34 +61,23 @@ const Chat = () => {
       if (status !== ACTION_HANDLER_STATUS.COMPLETE)
         return <ProcessingIndicator />;
 
-      let parsed = null;
-      try {
-        parsed = typeof result === 'string' ? JSON.parse(result) : result;
-      } catch {
-        return <></>;
-      }
+      const parsed = parseResult<{ type: QueryResultType }>(result);
 
-      if (parsed?.type === 'speaker') {
-        return <SpeakerResultCard data={parsed.data} />;
-      }
+      const renderCard = parsed?.type
+        ? RESULT_CARD_MAP[parsed.type as QueryResultType]
+        : null;
 
-      if (parsed?.type === 'venue' && parsed.data) {
-        return <VenueResultCard result={result} />;
-      }
+      if (renderCard) return renderCard(result) as React.ReactElement;
 
-      if (parsed?.type === 'contact_us') {
-        return <ContactResultCard result={result} />;
-      }
-
-      if (parsed?.type === 'agenda') {
-        return <AgendaResultCard result={result} />;
-      }
-
-      if (parsed?.type === 'partner') {
-        return <PartnerResultCard result={result} />;
-      }
-
-      return <></>;
+      const text = typeof result === 'string' ? result : JSON.stringify(result);
+      return (
+        <div className="px-4 py-2.5 text-sm leading-relaxed max-w-[72%] backdrop-blur-md rounded-tl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl bg-white/80 dark:bg-white/[.08] text-[#1e1040] dark:text-white/[.87] border border-[rgba(100,80,200,0.22)] dark:border-white/10 shadow-[0_2px_14px_rgba(100,80,200,0.1)]">
+          <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:font-semibold">
+            <Markdown content={text} />
+            <ProcessingIndicator />
+          </div>
+        </div>
+      );
     },
   });
 
