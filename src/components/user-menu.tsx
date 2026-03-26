@@ -36,6 +36,9 @@ export const UserMenu = () => {
     <UserAvatar />
   );
 
+  const rawName = user.displayName || user.email?.split('@')[0] || 'User';
+  const displayLabel = rawName.replace(/\s*\(.*\)\s*$/, '').trim() || rawName;
+
   return (
     <div className="relative" ref={menuRef}>
       {/* Trigger button */}
@@ -46,7 +49,7 @@ export const UserMenu = () => {
       >
         <div className="w-[22px] h-[22px] shrink-0">{avatar}</div>
         <span className="hidden sm:block text-xs font-semibold tracking-wide truncate max-w-[120px] font-syne text-[#3b2a8a] dark:text-white/[.82]">
-          {user.displayName || user.email}
+          {displayLabel}
         </span>
       </button>
 
@@ -67,7 +70,7 @@ export const UserMenu = () => {
               <div className="w-10 h-10 shrink-0">{avatar}</div>
               <div className="min-w-0">
                 <p className="text-sm font-semibold truncate text-[#1e1040] dark:text-white font-syne">
-                  {user.displayName}
+                  {displayLabel}
                 </p>
                 <p className="text-xs truncate text-[rgba(80,60,160,0.6)] dark:text-white/40 font-syne">
                   {user.email}

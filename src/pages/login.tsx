@@ -57,21 +57,12 @@ export default function LoginPage() {
         <div className="backdrop-blur-xl bg-white/[0.05] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/40 p-8 md:p-10">
           {/* Logo / Branding */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/25">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                />
-              </svg>
+            <div className="w-40 h-16 rounded-2xl from-indigo-500 to-purple-600 flex items-center justify-center mb-5 px-3">
+              <img
+                src="https://static.wixstatic.com/media/484b05_5308a7a859e54d94bf683cedf2a25f34~mv2.png/v1/fill/w_276,h_66,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Asset%2010.png"
+                alt="DevDay Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">
               DevDay Assistant
