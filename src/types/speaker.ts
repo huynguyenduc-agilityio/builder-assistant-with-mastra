@@ -9,6 +9,7 @@ export interface SpeakerData {
 export interface SpeakerQueryResult {
   type: 'speaker';
   data: SpeakerData[];
+  _purpose?: string;
 }
 
 export interface GroupedSpeaker {

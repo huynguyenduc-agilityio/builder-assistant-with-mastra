@@ -1,4 +1,9 @@
+import { useState } from 'react';
+import { InfoHubResponseType } from '@/types';
 import type { StatsCardProps } from '@/types';
+
+// Utils
+import { getInitials } from '@/utils/speaker';
 
 interface ReviewItem {
   userName: string;
@@ -14,7 +19,8 @@ interface Section {
   recentReviews?: ReviewItem[];
 }
 
-export const StatsCard = ({ status, result }: StatsCardProps) => {
+export const StatsCard = ({ status, result, speakerInfo }: StatsCardProps) => {
+  const [avatarError, setAvatarError] = useState(false);
   const isLoading = status !== 'complete';
 
   if (isLoading) {
@@ -67,9 +73,11 @@ export const StatsCard = ({ status, result }: StatsCardProps) => {
   return (
     <div className="flex flex-col gap-3 w-full">
       {sections.map((section, idx) => {
-        const isSpeaker = section.type === 'speaker';
+        const isSpeaker = section.type === InfoHubResponseType.SPEAKER;
         const avg = section.averageRating;
         const total = section.totalReviewers;
+        const hasSpeakerInfo = isSpeaker && speakerInfo && (speakerInfo.role || speakerInfo.company || speakerInfo.avatar);
+        const initials = getInitials(section.name || 'NA');
 
         return (
           <div
@@ -115,10 +123,55 @@ export const StatsCard = ({ status, result }: StatsCardProps) => {
                 )}
               </div>
 
-              {/* Name */}
-              <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-4">
-                {section.name}
-              </p>
+              {/* Speaker info section (with avatar, role, company) */}
+              {hasSpeakerInfo ? (
+                <div className="mb-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      {speakerInfo.avatar && !avatarError ? (
+                        <img
+                          src={speakerInfo.avatar}
+                          alt={section.name}
+                          className="w-11 h-11 rounded-full object-cover ring-2 ring-black/[0.06] dark:ring-white/10"
+                          onError={() => setAvatarError(true)}
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 ring-2 ring-black/[0.06] dark:ring-white/10">
+                          {initials}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Name + meta */}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 truncate">
+                        {section.name}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        {speakerInfo.role && (
+                          <span className="text-xs text-gray-500 dark:text-white/50">
+                            {speakerInfo.role}
+                          </span>
+                        )}
+                        {speakerInfo.role && speakerInfo.company && (
+                          <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20 shrink-0" />
+                        )}
+                        {speakerInfo.company && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 border border-violet-200/60 dark:border-violet-400/20">
+                            {speakerInfo.company}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Fallback: just show name (topic or no speaker details) */
+                <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-4">
+                  {section.name}
+                </p>
+              )}
 
               {/* Stats row */}
               <div className="flex items-end gap-6 mb-4">
