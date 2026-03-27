@@ -1,4 +1,11 @@
+import { useState } from 'react';
+
+// Utils
+import { getInitials } from '@/utils/speaker';
+
+// Types
 import type { RatingCardProps } from '@/types';
+import { InfoHubResponseType } from '@/types';
 
 export const RatingCard = ({
   target,
@@ -6,9 +13,14 @@ export const RatingCard = ({
   rating,
   reviewerName,
   status,
+  speakerInfo,
 }: RatingCardProps) => {
+  const [avatarError, setAvatarError] = useState(false);
+
   const isLoading = status !== 'complete';
-  const isSpeaker = target === 'speaker';
+  const isSpeaker = target === InfoHubResponseType.SPEAKER;
+  const hasSpeakerInfo = isSpeaker && speakerInfo && (speakerInfo.role || speakerInfo.company || speakerInfo.avatar);
+  const initials = getInitials(name || 'NA');
 
   return (
     <div className="relative overflow-hidden w-full max-w-sm rounded-tl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl border border-[rgba(100,80,200,0.22)] dark:border-white/10 bg-white/80 dark:bg-white/[.08] backdrop-blur-md shadow-[0_2px_14px_rgba(100,80,200,0.1)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]">
@@ -53,10 +65,55 @@ export const RatingCard = ({
           )}
         </div>
 
-        {/* Name */}
-        <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-4">
-          {name || 'Loading…'}
-        </p>
+        {/* Speaker info section */}
+        {hasSpeakerInfo ? (
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                {speakerInfo.avatar && !avatarError ? (
+                  <img
+                    src={speakerInfo.avatar}
+                    alt={name}
+                    className="w-11 h-11 rounded-full object-cover ring-2 ring-black/[0.06] dark:ring-white/10"
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 ring-2 ring-black/[0.06] dark:ring-white/10">
+                    {initials}
+                  </div>
+                )}
+              </div>
+
+              {/* Name + meta */}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 truncate">
+                  {name || 'Loading…'}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  {speakerInfo.role && (
+                    <span className="text-xs text-gray-500 dark:text-white/50">
+                      {speakerInfo.role}
+                    </span>
+                  )}
+                  {speakerInfo.role && speakerInfo.company && (
+                    <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20 shrink-0" />
+                  )}
+                  {speakerInfo.company && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 border border-violet-200/60 dark:border-violet-400/20">
+                      {speakerInfo.company}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Fallback: just show name */
+          <p className="text-sm font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-4">
+            {name || 'Loading…'}
+          </p>
+        )}
 
         {/* Stars + score */}
         <div className="flex items-center gap-1 mb-4">

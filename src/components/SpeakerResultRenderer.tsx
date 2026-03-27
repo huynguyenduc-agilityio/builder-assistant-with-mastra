@@ -3,9 +3,14 @@ import { groupSpeakers } from '@/utils/speaker';
 
 // Components
 import { SpeakerCard } from './SpeakerCard';
+import { SpeakerQueryResult } from './SpeakerQueryResult';
 
 // Types
-import type { SpeakerData, SpeakerQueryResult } from '@/types';
+import {
+  InfoHubResponseType,
+  type SpeakerData,
+  type SpeakerQueryResult as SpeakerQueryResultType,
+} from '@/types';
 
 interface SpeakerResultCardProps {
   data: SpeakerData[];
@@ -43,26 +48,32 @@ export const SpeakerResultCard = ({ data }: SpeakerResultCardProps) => {
 };
 
 interface SpeakerResultRendererProps {
-  result: string | SpeakerQueryResult | unknown;
+  result: string | SpeakerQueryResultType | unknown;
 }
 
 export const SpeakerResultRenderer = ({
   result,
 }: SpeakerResultRendererProps) => {
-  let parsed: SpeakerQueryResult | null = null;
+  let parsed: SpeakerQueryResultType | null = null;
 
   try {
     parsed =
       typeof result === 'string'
         ? JSON.parse(result)
-        : (result as SpeakerQueryResult);
+        : (result as SpeakerQueryResultType);
   } catch {
     return null;
   }
 
-  if (!parsed || parsed.type !== 'speaker' || !Array.isArray(parsed.data)) {
+  if (
+    !parsed ||
+    parsed.type !== InfoHubResponseType.SPEAKER ||
+    !Array.isArray(parsed.data)
+  ) {
     return null;
   }
 
-  return <SpeakerResultCard data={parsed.data} />;
+  return (
+    <SpeakerQueryResult data={parsed.data || []} purpose={parsed._purpose} />
+  );
 };

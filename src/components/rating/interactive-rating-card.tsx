@@ -3,8 +3,12 @@ import { useState } from 'react';
 // Constants
 import { MASTRA_BASE_URL, RATING_LABELS } from '@/constants';
 
+// Utils
+import { getInitials } from '@/utils/speaker';
+
 // Types
 import type { InteractiveRatingCardProps } from '@/types';
+import { InfoHubResponseType } from '@/types';
 
 export const InteractiveRatingCard = ({
   target,
@@ -14,14 +18,18 @@ export const InteractiveRatingCard = ({
   email,
   onSubmit,
   onCancel,
+  speakerInfo,
 }: InteractiveRatingCardProps) => {
   const [selectedRating, setSelectedRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [avatarError, setAvatarError] = useState(false);
 
   const displayRating = hoveredRating || selectedRating;
-  const isSpeaker = target === 'speaker';
+  const isSpeaker = target === InfoHubResponseType.SPEAKER;
+  const hasSpeakerInfo = isSpeaker && speakerInfo && (speakerInfo.role || speakerInfo.company || speakerInfo.avatar);
+  const initials = getInitials(name);
 
   const handleSubmit = async () => {
     if (selectedRating === 0) {
@@ -103,10 +111,55 @@ export const InteractiveRatingCard = ({
           </span>
         </div>
 
-        {/* Name */}
-        <p className="text-base font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-5">
-          {name}
-        </p>
+        {/* Speaker info section */}
+        {hasSpeakerInfo ? (
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                {speakerInfo.avatar && !avatarError ? (
+                  <img
+                    src={speakerInfo.avatar}
+                    alt={name}
+                    className="w-11 h-11 rounded-full object-cover ring-2 ring-black/[0.06] dark:ring-white/10"
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 ring-2 ring-black/[0.06] dark:ring-white/10">
+                    {initials}
+                  </div>
+                )}
+              </div>
+
+              {/* Name + meta */}
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-semibold text-[#1e1040] dark:text-white/90 truncate">
+                  {name}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  {speakerInfo.role && (
+                    <span className="text-xs text-gray-500 dark:text-white/50">
+                      {speakerInfo.role}
+                    </span>
+                  )}
+                  {speakerInfo.role && speakerInfo.company && (
+                    <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20 shrink-0" />
+                  )}
+                  {speakerInfo.company && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 border border-violet-200/60 dark:border-violet-400/20">
+                      {speakerInfo.company}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Fallback: just show name */
+          <p className="text-base font-semibold text-[#1e1040] dark:text-white/90 leading-snug mb-5">
+            {name}
+          </p>
+        )}
 
         {/* Stars */}
         <div className="mb-4">
