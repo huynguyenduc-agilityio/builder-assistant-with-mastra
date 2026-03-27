@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { INFO_HUB_PROMPT } from '../constants/infoHub/prompts';
 import { submitRating, buildRatingStats } from '@/lib/ratings-service';
+import { InfoHubResponseType } from '@/types';
 
 export const rateTool = createTool({
   id: INFO_HUB_PROMPT.rateTool.key,
@@ -90,7 +91,7 @@ const rateSpeakerTopicExecute = async ({
   try {
     const clampedRating = Math.round(Math.min(5, Math.max(1, rating || 5)));
     const resolvedUserName = userName || 'Anonymous';
-    const targetLabel = target === 'speaker' ? 'speaker' : 'topic';
+    const targetLabel = target === InfoHubResponseType.SPEAKER ? 'speaker' : 'topic';
 
     // Submit to Firestore
     const { entry, isUpdate } = await submitRating({
