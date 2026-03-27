@@ -18,9 +18,24 @@ export const queryInfoDataTool = createTool({
       .string()
       .optional()
       .describe('User query (supports English and Vietnamese)'),
+    purpose: z
+      .enum(['info', 'rating', 'stats'])
+      .optional()
+      .describe(
+        'Purpose of the query: "info" for general information lookup (default), "rating" when searching to verify a speaker/topic before rating, "stats" when searching to verify a speaker/topic before retrieving rating statistics',
+      ),
   }),
-  execute: async ({ query }) => {
-    return await queryInfoDataToolExecute({ query });
+  execute: async ({ query, purpose }) => {
+    const result = await queryInfoDataToolExecute({ query });
+
+    // Attach purpose to the result so the frontend can use it
+    try {
+      const parsed = JSON.parse(result);
+      parsed._purpose = purpose || 'info';
+      return JSON.stringify(parsed);
+    } catch {
+      return result;
+    }
   },
 });
 

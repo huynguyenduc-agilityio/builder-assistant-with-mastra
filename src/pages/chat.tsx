@@ -8,6 +8,11 @@ import {
   StatsCard,
 } from '@/components/rating';
 
+// Types
+import type { SpeakerInfo } from '@/types';
+import { ACTION_HANDLER_STATUS, InfoHubResponseType } from '@/types';
+import { parseResult } from '@/utils';
+
 // Components
 import { ProcessingIndicator, resolveIsDark, useTheme } from '@/components';
 import {
@@ -27,19 +32,8 @@ import { PartnerResultCard } from '@/components/PartnerCard';
 // Constants
 import { COPILOT_LABEL, MASTRA_BASE_URL } from '@/constants';
 
-// Types
-import { ACTION_HANDLER_STATUS } from '@/types';
-import { parseResult } from '@/utils';
-
-type QueryResultType =
-  | 'speaker'
-  | 'venue'
-  | 'contact_us'
-  | 'agenda'
-  | 'partner';
-
 const RESULT_CARD_MAP: Record<
-  QueryResultType,
+  InfoHubResponseType,
   (result: unknown) => React.ReactNode
 > = {
   speaker: (result) => <SpeakerResultRenderer result={result} />,
@@ -61,10 +55,10 @@ const Chat = () => {
       if (status !== ACTION_HANDLER_STATUS.COMPLETE)
         return <ProcessingIndicator />;
 
-      const parsed = parseResult<{ type: QueryResultType }>(result);
+      const parsed = parseResult<{ type: InfoHubResponseType }>(result);
 
       const renderCard = parsed?.type
-        ? RESULT_CARD_MAP[parsed.type as QueryResultType]
+        ? RESULT_CARD_MAP[parsed.type as InfoHubResponseType]
         : null;
 
       if (renderCard) return renderCard(result) as React.ReactElement;
@@ -98,14 +92,46 @@ const Chat = () => {
         description:
           'The name of the speaker or topic that the user wants to rate',
       },
+      {
+        name: 'speakerRole',
+        type: 'string',
+        required: false,
+        description:
+          'The role/title of the speaker (from queryInfoDataTool result)',
+      },
+      {
+        name: 'speakerCompany',
+        type: 'string',
+        required: false,
+        description:
+          'The company of the speaker (from queryInfoDataTool result)',
+      },
+      {
+        name: 'speakerAvatar',
+        type: 'string',
+        required: false,
+        description:
+          'The avatar URL of the speaker (from queryInfoDataTool result)',
+      },
     ],
     renderAndWait: ({ args, status, respond, result }) => {
       const resolvedTarget = args.target || 'speaker';
       const resolvedName =
-        args.name || (resolvedTarget === 'speaker' ? 'Speaker' : 'Topic');
+        args.name ||
+        (resolvedTarget === InfoHubResponseType.SPEAKER ? 'Speaker' : 'Topic');
 
       const reviewerDisplayName = user?.displayName || 'Anonymous';
       const reviewerUserId = user?.uid || 'anonymous';
+
+      // Build speakerInfo from args (passed by the agent from queryInfoDataTool result)
+      const speakerInfo: SpeakerInfo | undefined =
+        args.speakerRole || args.speakerCompany || args.speakerAvatar
+          ? {
+              role: args.speakerRole || undefined,
+              company: args.speakerCompany || undefined,
+              avatar: args.speakerAvatar || undefined,
+            }
+          : undefined;
 
       // After submission, show the completed rating card
       if (status === ACTION_HANDLER_STATUS.COMPLETE) {
@@ -155,6 +181,7 @@ const Chat = () => {
             rating={completedRating}
             reviewerName={reviewerDisplayName}
             status={status}
+            speakerInfo={speakerInfo}
           />
         );
       }
@@ -168,6 +195,7 @@ const Chat = () => {
             rating={0}
             reviewerName={reviewerDisplayName}
             status="inProgress"
+            speakerInfo={speakerInfo}
           />
         );
       }
@@ -182,6 +210,7 @@ const Chat = () => {
           email={user?.email || ''}
           onSubmit={(result) => respond(result)}
           onCancel={(result) => respond(result)}
+          speakerInfo={speakerInfo}
         />
       );
     },
@@ -203,9 +232,46 @@ const Chat = () => {
         required: false,
         description: 'The speaker or topic name to retrieve rating stats for',
       },
+      {
+        name: 'speakerRole',
+        type: 'string',
+        required: false,
+        description:
+          'The role/title of the speaker (from queryInfoDataTool result)',
+      },
+      {
+        name: 'speakerCompany',
+        type: 'string',
+        required: false,
+        description:
+          'The company of the speaker (from queryInfoDataTool result)',
+      },
+      {
+        name: 'speakerAvatar',
+        type: 'string',
+        required: false,
+        description:
+          'The avatar URL of the speaker (from queryInfoDataTool result)',
+      },
     ],
-    render: ({ result, status }) => {
-      return <StatsCard status={status} result={result} />;
+    render: ({ args, result, status }) => {
+      // Build speakerInfo from args (only for speaker stats, not topic)
+      const statsSpeakerInfo: SpeakerInfo | undefined =
+        args.speakerRole || args.speakerCompany || args.speakerAvatar
+          ? {
+              role: args.speakerRole || undefined,
+              company: args.speakerCompany || undefined,
+              avatar: args.speakerAvatar || undefined,
+            }
+          : undefined;
+
+      return (
+        <StatsCard
+          status={status}
+          result={result}
+          speakerInfo={statsSpeakerInfo}
+        />
+      );
     },
   });
 

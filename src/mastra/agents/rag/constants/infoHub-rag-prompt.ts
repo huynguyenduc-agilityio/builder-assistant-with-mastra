@@ -1,4 +1,4 @@
-import { InfoHubResponseType } from '@/mastra/types';
+import { InfoHubResponseType } from '@/types';
 
 export const INFO_HUB_RAG_PROMPT = {
   answer_prompt: (
@@ -31,20 +31,28 @@ export const INFO_HUB_RAG_PROMPT = {
 
       Classify the question into ONE of these:
 
-      ### 1. SPEAKER_RELATED_QUERY
+      ### 1. SPEAKER_RELATED_QUERY  ⭐ HIGHEST PRIORITY
       If the question:
       - asks about speaker(s) / diễn giả
       - asks who presents a topic / ai trình bày chủ đề
       - asks about a specific session/topic / phiên / chủ đề cụ thể
       - asks for details of a talk/session / chi tiết bài nói
+      - asks which speakers are from a company / diễn giả nào đến từ công ty X
+      - asks about speakers related to an organization / diễn giả liên quan đến tổ chức
 
       👉 Even if "speaker" or "diễn giả" is NOT explicitly mentioned,
       you MUST treat topic/session questions as SPEAKER_RELATED_QUERY
+
+      ⚠️ PRIORITY RULE: If the question mentions "speaker" / "diễn giả" / "who presents" / "ai trình bày"
+      in ANY way, it is ALWAYS a SPEAKER_RELATED_QUERY — even if the question also mentions
+      a company name that is a partner/sponsor/exhibitor. The intent is about PEOPLE, not ORGANIZATIONS.
 
       Vietnamese examples:
       - "Ai nói về Zero Trust?" → SPEAKER_RELATED_QUERY
       - "Chủ đề Kubernetes do ai trình bày?" → SPEAKER_RELATED_QUERY
       - "Cho tôi biết về phiên Fintech" → SPEAKER_RELATED_QUERY
+      - "Những diễn giả nào đến từ Axon Active?" → SPEAKER_RELATED_QUERY (asks about SPEAKERS, not partners)
+      - "Diễn giả nào thuộc công ty KMS?" → SPEAKER_RELATED_QUERY
 
       ---
 
@@ -122,16 +130,22 @@ export const INFO_HUB_RAG_PROMPT = {
       - asks about media partners / đối tác truyền thông
       - asks about companion or supported-by organizations / đơn vị đồng hành, đơn vị hỗ trợ
 
+      ⚠️ EXCLUSION: If the question asks about SPEAKERS / DIỄN GIẢ from a company
+      (even a partner/sponsor company), it is NOT a PARTNER_QUERY — it is a SPEAKER_RELATED_QUERY.
+      PARTNER_QUERY is ONLY about the partner/sponsor organizations themselves, not about individual people.
+
       Vietnamese examples:
       - "Ai là nhà tài trợ DevDay?" → PARTNER_QUERY
       - "DevDay có những đối tác nào?" → PARTNER_QUERY
       - "Đơn vị tổ chức DevDay là ai?" → PARTNER_QUERY
       - "Sponsor của DevDay là ai?" → PARTNER_QUERY
+      - ❌ "Những diễn giả nào đến từ Axon Active?" → NOT PARTNER_QUERY (→ SPEAKER_RELATED_QUERY)
 
       English examples:
       - "Who sponsors DevDay?" → PARTNER_QUERY
       - "What companies are partners of DevDay?" → PARTNER_QUERY
       - "Who are the exhibitors?" → PARTNER_QUERY
+      - ❌ "Which speakers are from KMS?" → NOT PARTNER_QUERY (→ SPEAKER_RELATED_QUERY)
 
       ---
 
