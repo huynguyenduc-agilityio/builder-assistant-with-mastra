@@ -1,4 +1,4 @@
-import { CopilotChat, Markdown } from '@copilotkit/react-ui';
+import { CopilotChat } from '@copilotkit/react-ui';
 import { CopilotKit, useCopilotAction } from '@copilotkit/react-core';
 import '@copilotkit/react-ui/styles.css';
 import { useAuth } from '@/components/auth-context';
@@ -55,7 +55,6 @@ const Chat = () => {
   useCopilotAction({
     name: 'queryInfoDataTool',
     available: 'disabled',
-    followUp: false,
     render: ({ args, status, result }) => {
       console.log('{ args, status, result }: ', { args, status, result });
       if (status !== ACTION_HANDLER_STATUS.COMPLETE)
@@ -69,14 +68,7 @@ const Chat = () => {
 
       if (renderCard) return renderCard(result) as React.ReactElement;
 
-      const text = typeof result === 'string' ? result : JSON.stringify(result);
-      return (
-        <div className="px-4 py-2.5 text-sm leading-relaxed max-w-[72%] backdrop-blur-md rounded-tl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl bg-white/80 dark:bg-white/[.08] text-[#1e1040] dark:text-white/[.87] border border-[rgba(100,80,200,0.22)] dark:border-white/10 shadow-[0_2px_14px_rgba(100,80,200,0.1)]">
-          <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:font-semibold">
-            <Markdown content={text} />
-          </div>
-        </div>
-      );
+      return <></>;
     },
   });
 
